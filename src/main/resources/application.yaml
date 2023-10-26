@@ -1,13 +1,34 @@
 server:
   address: 0.0.0.0
 spring:
+  mvc:
+    format:
+      date: yyyy-MM-dd
+      time: HH:mm:ss
+      date-time: iso
   application.name: time-planner-server
+  liquibase:
+    enabled: false
+    change-log: config/liquibase/master.xml
+  datasource:
+    url: jdbc:postgresql://localhost:5432/time_planner_db
+    username: user
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    generate-ddl: true
+    properties:
+      hibernate:
+  #        default_schema: time_planner
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://securetoken.google.com/time-planner-dc611
           jwk-set-uri: https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
