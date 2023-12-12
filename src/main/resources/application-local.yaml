@@ -1,0 +1,14 @@
+server:
+  address: 0.0.0.0
+  port: 8080
+spring:
+  liquibase:
+    enabled: true
+  datasource:
+    url: jdbc:mysql://aws.connect.psdb.cloud/time-planner?sslMode=VERIFY_IDENTITY
+    username: 3smiabdb3fscv66f4lxg
+    password: pscale_pw_4A75zCBs3Z8J8FtIe6hJY2EQzMs0tzvbkHZOht8UeAF
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    generate-ddl: false

@@ -1,13 +1,17 @@
-package com.pw.timeplanner.api;
+package com.pw.timeplanner.feature.tasks.api;
 
-import com.pw.timeplanner.api.dto.TaskDTO;
-import com.pw.timeplanner.api.dto.TaskUpdateDTO;
+import com.pw.timeplanner.feature.tasks.api.dto.CreateTaskDTO;
+import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
+import com.pw.timeplanner.feature.tasks.api.dto.TaskUpdateDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,9 +39,17 @@ public interface TasksResource {
     Optional<TaskDTO> getTask(JwtAuthenticationToken authentication,
                               @PathVariable("id") UUID id);
 
+    @DeleteMapping("/{id}")
+    void deleteTask(JwtAuthenticationToken authentication,
+                              @PathVariable("id") UUID id);
+
     @PatchMapping("/{id}")
     Optional<TaskDTO> updateTask(JwtAuthenticationToken authentication,
                        @PathVariable("id") UUID id,
-                       @RequestBody TaskUpdateDTO taskUpdateDTO);
+                       @RequestBody @Validated TaskUpdateDTO taskUpdateDTO);
+
+    @PostMapping
+    Optional<TaskDTO> createTask(JwtAuthenticationToken authentication,
+                                 @RequestBody @Validated CreateTaskDTO createTaskDTO);
 
 }

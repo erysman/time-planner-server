@@ -1,6 +1,6 @@
 package com.pw.timeplanner.feature.tasks.entity;
 
-import com.pw.timeplanner.core.BaseEntity;
+import com.pw.timeplanner.core.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Getter
+@Setter
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,17 +23,15 @@ import java.time.LocalTime;
 public class TaskEntity extends BaseEntity {
 
     @Column(nullable = false)
-    @Setter
     private String name;
 
-    @Setter
-    private LocalDate startDate;
+    private LocalDate startDay;
 
-    @Setter
     private LocalTime startTime;
 
-    @Setter
     private Integer durationMin;
+
+    private Integer dayOrder;
 
     @Column(nullable = false)
     private String userId;
