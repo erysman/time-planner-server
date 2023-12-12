@@ -1,5 +1,25 @@
+features:
+  tasks:
+    time-granularity-minutes: 15
+    min-duration-minutes: 30
+
+#com:
+#  pw:
+#    timeplanner:
+#      core:
+#        validation:
+#          NullOrNotBlank:
+#            message:
+#      feature:
+#        tasks:
+#          validation:
+#            NullOrGreaterThanMinimumDuration:
+#              message:
 server:
-  address: 0.0.0.0
+#  address: 0.0.0.0
+  port: ${PORT:8080}
+  error:
+    include-message: always
 spring:
   mvc:
     format:
@@ -8,18 +28,23 @@ spring:
       date-time: iso
   application.name: time-planner-server
   liquibase:
-    enabled: false
-    change-log: config/liquibase/master.xml
-  datasource:
-    url: jdbc:postgresql://localhost:5432/time_planner_db
-    username: user
-    password: password
+    enabled: true
+#    change-log: config/liquibase/master.xml
   jpa:
     hibernate:
-      ddl-auto: update
-    generate-ddl: true
+      ddl-auto: validate
+    generate-ddl: false
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        jdbc:
+          batch_size: 50
+          order_inserts: true
+          order_updates: true
+          batch_versioned_data: true
+        format_sql: true
+    show-sql: true
+
   #        default_schema: time_planner
 
   security:
@@ -42,3 +67,25 @@ management:
   endpoint:
     health:
       enabled: true
+
+#logging:
+#  level:
+#    com:
+#      pw:
+#        timeplanner:
+#          config:
+#            RequestLoggingFilter: DEBUG
+
+logging:
+  level:
+    org:
+      springframework:
+        transaction: TRACE
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+#              BasicBinder: TRACE
+      zalando:
+        logbook: TRACE

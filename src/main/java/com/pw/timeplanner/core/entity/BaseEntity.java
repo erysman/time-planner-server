@@ -1,4 +1,4 @@
-package com.pw.timeplanner.core;
+package com.pw.timeplanner.core.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
