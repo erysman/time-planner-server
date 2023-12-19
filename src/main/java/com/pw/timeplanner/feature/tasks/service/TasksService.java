@@ -57,12 +57,12 @@ public class TasksService {
     }
 
     public Optional<TaskDTO> updateTask(String userId, UUID taskId, TaskUpdateDTO taskUpdateDTO) {
-        tasksValidator.validate(taskUpdateDTO);
         Optional<TaskEntity> entity = tasksRepository.findOneByUserIdAndId(userId, taskId);
         if (entity.isEmpty()) {
             return Optional.empty();
         }
         TaskEntity task = entity.get();
+        tasksValidator.validateUpdate(taskUpdateDTO, task);
         if (taskUpdateDTO.getStartTime() != null || taskUpdateDTO.getStartDay() != null) {
             tasksOrderService.updateDayOrder(userId, task, taskUpdateDTO.getStartDay(), taskUpdateDTO.getStartTime());
         }

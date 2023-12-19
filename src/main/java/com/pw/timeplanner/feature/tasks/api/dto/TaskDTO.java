@@ -1,7 +1,6 @@
 package com.pw.timeplanner.feature.tasks.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.pw.timeplanner.feature.tasks.validation.NullOrGreaterThanMinimumDuration;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
@@ -28,6 +27,5 @@ public class TaskDTO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     LocalTime startTime;
 
-    @NullOrGreaterThanMinimumDuration
     Integer durationMin;
 }
