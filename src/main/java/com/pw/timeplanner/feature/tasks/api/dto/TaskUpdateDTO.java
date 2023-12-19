@@ -2,7 +2,6 @@ package com.pw.timeplanner.feature.tasks.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pw.timeplanner.core.validation.NullOrNotBlank;
-import com.pw.timeplanner.feature.tasks.validation.NullOrGreaterThanMinimumDuration;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +29,6 @@ public class TaskUpdateDTO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     JsonNullable<LocalTime> startTime;
 
-    @NullOrGreaterThanMinimumDuration
-    Integer durationMin;
+    @Schema(type = "integer", nullable = true)
+    JsonNullable<Integer> durationMin;
 }
