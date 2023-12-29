@@ -1,8 +1,10 @@
 package com.pw.timeplanner.feature.tasks.controller;
 
 import com.pw.timeplanner.feature.tasks.api.DayTasksResource;
+import com.pw.timeplanner.feature.tasks.api.dto.ScheduleInfoDTO;
 import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
 import com.pw.timeplanner.feature.tasks.service.DayTasksService;
+import com.pw.timeplanner.feature.tasks.service.ScheduleService;
 import com.pw.timeplanner.feature.tasks.service.TasksService;
 import com.pw.timeplanner.feature.tasks.service.exceptions.DataConflictException;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class DayTasksController implements DayTasksResource {
 
     private final TasksService tasksService;
     private final DayTasksService dayTasksService;
+    private final ScheduleService scheduleService;
 
     @Override
     public List<TaskDTO> getDayTasks(JwtAuthenticationToken authentication, @DateTimeFormat LocalDate day) {
@@ -47,5 +50,23 @@ public class DayTasksController implements DayTasksResource {
             log.info(e.getMessage());
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
+    }
+
+    @Override
+    public ScheduleInfoDTO getAutoScheduleInfo(JwtAuthenticationToken authentication, LocalDate day) {
+        String userId = authentication.getToken().getClaim("user_id");
+        return scheduleService.getInfo(userId, day);
+    }
+
+    @Override
+    public void schedule(JwtAuthenticationToken authentication, LocalDate day) {
+        String userId = authentication.getToken().getClaim("user_id");
+        scheduleService.schedule(userId, day);
+    }
+
+    @Override
+    public void revokeSchedule(JwtAuthenticationToken authentication, LocalDate day) {
+        String userId = authentication.getToken().getClaim("user_id");
+        scheduleService.revokeSchedule(userId, day);
     }
 }

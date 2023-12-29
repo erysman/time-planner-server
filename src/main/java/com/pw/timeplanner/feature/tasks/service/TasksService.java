@@ -65,9 +65,9 @@ public class TasksService {
         tasksValidator.validateUpdate(taskUpdateDTO, task);
         if (taskUpdateDTO.getStartTime() != null || taskUpdateDTO.getStartDay() != null) {
             tasksOrderService.updateDayOrder(userId, task, taskUpdateDTO.getStartDay(), taskUpdateDTO.getStartTime());
+            task.setAutoScheduled(false);
         }
         mapper.update(taskUpdateDTO, task);
-//        TaskEntity updatedTask = this.updateEntityFromDTO(taskUpdateDTO, task);
         return Optional.of(mapper.toDTO(task));
     }
 
