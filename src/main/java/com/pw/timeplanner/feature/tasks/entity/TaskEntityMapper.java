@@ -19,6 +19,7 @@ public interface TaskEntityMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "dayOrder", ignore = true)
+    @Mapping(target = "autoScheduled", ignore = true)
     TaskEntity toEntity(TaskDTO dto);
 
     @Mapping(target = "creationDate", ignore = true)
@@ -26,6 +27,7 @@ public interface TaskEntityMapper {
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "dayOrder", ignore = true)
+    @Mapping(target = "autoScheduled", ignore = true)
 //    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     TaskEntity createEntity(CreateTaskDTO dto);
 
@@ -35,5 +37,6 @@ public interface TaskEntityMapper {
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "dayOrder", ignore = true)
+    @Mapping(target = "autoScheduled", ignore = true)
     void update(TaskUpdateDTO update, @MappingTarget TaskEntity entity);
 }

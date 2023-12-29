@@ -2,6 +2,7 @@ features:
   tasks:
     time-granularity-minutes: 15
     min-duration-minutes: 30
+    defaultDurationMinutes: 60
 
 #com:
 #  pw:

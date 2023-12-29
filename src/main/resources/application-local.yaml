@@ -1,3 +1,5 @@
+
+
 server:
   address: 0.0.0.0
   port: 8080
@@ -6,9 +8,12 @@ spring:
     enabled: true
   datasource:
     url: jdbc:mysql://aws.connect.psdb.cloud/time-planner?sslMode=VERIFY_IDENTITY
-    username: 3smiabdb3fscv66f4lxg
-    password: pscale_pw_4A75zCBs3Z8J8FtIe6hJY2EQzMs0tzvbkHZOht8UeAF
+    username: 7ynmk8ie3qf8lxvym840
+    password: pscale_pw_SQtm0cPLC7HNiy54tE2P9lUAlRJXRZj0WIJJAabEaSz
   jpa:
     hibernate:
       ddl-auto: validate
     generate-ddl: false
+client:
+  scheduler:
+    base-url: http://localhost:8082/v1

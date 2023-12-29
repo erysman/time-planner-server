@@ -1,6 +1,6 @@
 package com.pw.timeplanner.feature.tasks.service;
 
-import com.pw.timeplanner.feature.tasks.TasksProperties;
+import com.pw.timeplanner.config.TasksProperties;
 import com.pw.timeplanner.feature.tasks.api.dto.CreateTaskDTO;
 import com.pw.timeplanner.feature.tasks.api.dto.TaskUpdateDTO;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
