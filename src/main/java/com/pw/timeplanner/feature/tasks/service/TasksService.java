@@ -1,10 +1,13 @@
 package com.pw.timeplanner.feature.tasks.service;
 
+import com.pw.timeplanner.config.TasksProperties;
 import com.pw.timeplanner.feature.tasks.api.dto.CreateTaskDTO;
 import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
 import com.pw.timeplanner.feature.tasks.api.dto.TaskUpdateDTO;
+import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntityMapper;
+import com.pw.timeplanner.feature.tasks.repository.ProjectsRepository;
 import com.pw.timeplanner.feature.tasks.repository.TasksRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -22,28 +25,61 @@ import java.util.UUID;
 @Transactional
 public class TasksService {
 
+    private final ProjectsRepository projectsRepository;
     private final TasksRepository tasksRepository;
     private final TaskEntityMapper mapper;
     private final TasksOrderService tasksOrderService;
     private final TasksValidator tasksValidator;
-
+    private final TasksProperties properties;
 
     public Optional<TaskDTO> createTask(String userId, CreateTaskDTO createTaskDTO) {
         tasksValidator.validate(createTaskDTO);
+        ProjectEntity projectEntity = getProject(userId, createTaskDTO);
         TaskEntity entity = mapper.createEntity(createTaskDTO);
         entity.setUserId(userId);
+        entity.setProject(projectEntity);
         tasksOrderService.setOrderForDayAndProject(userId, entity);
         TaskEntity saved = tasksRepository.save(entity);
         return Optional.of(mapper.toDTO(saved));
     }
 
+    private ProjectEntity getProject(String userId, CreateTaskDTO createTaskDTO) {
+        if (createTaskDTO.getProjectId() == null) {
+            return getDefaultProject(userId);
+        } else {
+            return getProjectById(userId, createTaskDTO.getProjectId());
+        }
+    }
+
+    private ProjectEntity getDefaultProject(String userId) {
+        Optional<ProjectEntity> defaultProjectEntity = projectsRepository.findOneByUserIdAndName(userId,
+                properties.getDefaultProjectName());
+        return defaultProjectEntity.orElseGet(() -> saveDefaultProject(userId));
+    }
+
+    private ProjectEntity saveDefaultProject(String userId) {
+        ProjectEntity defaultProject = ProjectEntity.builder()
+                .name(properties.getDefaultProjectName())
+                .userId(userId)
+                .build();
+        return projectsRepository.save(defaultProject);
+    }
+
+    private ProjectEntity getProjectById(String userId, UUID projectId) {
+        Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId);
+        return projectEntity.orElseThrow(() -> new IllegalArgumentException("Project not found: " + projectId));
+    }
 
     public List<TaskDTO> getTasks(String userId, LocalDate startDate) {
-        return tasksRepository.findAllByUserIdAndStartDay(userId, startDate).stream().map(mapper::toDTO).toList();
+        return tasksRepository.findAllByUserIdAndStartDay(userId, startDate)
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
     }
 
     public Optional<TaskDTO> getTask(String userId, UUID taskId) {
-        return tasksRepository.findOneByUserIdAndId(userId, taskId).map(mapper::toDTO);
+        return tasksRepository.findOneByUserIdAndId(userId, taskId)
+                .map(mapper::toDTO);
     }
 
     public boolean deleteTask(String userId, UUID taskId) {
@@ -57,7 +93,8 @@ public class TasksService {
     }
 
     public Optional<TaskDTO> updateTask(String userId, UUID taskId, TaskUpdateDTO taskUpdateDTO) {
-        Optional<TaskEntity> entity = tasksRepository.findOneByUserIdAndId(userId, taskId);
+        log.info("Updating task " + taskId + " with: " + taskUpdateDTO);
+        Optional<TaskEntity> entity = tasksRepository.lockAndFindOneByUserIdAndId(userId, taskId);
         if (entity.isEmpty()) {
             return Optional.empty();
         }

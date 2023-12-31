@@ -1,5 +1,6 @@
 package com.pw.timeplanner.feature.tasks.service;
 
+import com.pw.timeplanner.config.TasksProperties;
 import com.pw.timeplanner.feature.tasks.entity.Priority;
 import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
@@ -22,6 +23,7 @@ import java.time.LocalTime;
 @Slf4j
 public class LocalDataInitializer {
 
+    private final TasksProperties properties;
     private final TasksRepository tasksRepository;
     private final ProjectsRepository projectsRepository;
     private PlatformTransactionManager transactionManager;
@@ -40,7 +42,8 @@ public class LocalDataInitializer {
             }
             log.info("Initializing db with mocked entities for day: {}", now);
             ProjectEntity p1 = ProjectEntity.builder()
-                    .name("inbox")
+                    .name(properties.getDefaultProjectName())
+                    .userId(userId)
                     .scheduleStartTime(LocalTime.of(0, 0, 0))
                     .scheduleEndTime(LocalTime.of(23, 59, 59))
                     .build();
