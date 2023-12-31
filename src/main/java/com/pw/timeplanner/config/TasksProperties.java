@@ -11,4 +11,5 @@ public class TasksProperties {
     Integer timeGranularityMinutes;
     Integer minDurationMinutes;
     Integer defaultDurationMinutes;
+    String defaultProjectName;
 }

@@ -3,6 +3,7 @@ features:
     time-granularity-minutes: 15
     min-duration-minutes: 30
     defaultDurationMinutes: 60
+    defaultProjectName: inbox
 
 #com:
 #  pw:

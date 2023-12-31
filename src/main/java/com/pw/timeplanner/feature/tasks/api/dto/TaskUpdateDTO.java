@@ -12,6 +12,7 @@ import org.openapitools.jackson.nullable.JsonNullable;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -31,4 +32,10 @@ public class TaskUpdateDTO implements Serializable {
 
     @Schema(type = "integer", nullable = true)
     JsonNullable<Integer> durationMin;
+
+    @Schema(nullable = true)
+    PriorityDTO priority;
+
+    @Schema(nullable = true)
+    UUID projectId;
 }

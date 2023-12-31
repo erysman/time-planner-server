@@ -27,5 +27,10 @@ public class TaskDTO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     LocalTime startTime;
 
+    @Schema(nullable = true)
     Integer durationMin;
+
+    PriorityDTO priority;
+
+    UUID projectId;
 }

@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,7 +44,9 @@ public class TaskEntity extends BaseEntity {
     @Column(nullable = false)
     private String userId;
 
-    private Boolean autoScheduled;
+    @Builder.Default
+    @Column(columnDefinition = "boolean default false")
+    private Boolean autoScheduled = false;
 
     private Priority priority;
 

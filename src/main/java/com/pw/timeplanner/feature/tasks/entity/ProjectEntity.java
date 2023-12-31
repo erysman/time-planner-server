@@ -7,6 +7,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,9 +28,14 @@ public class ProjectEntity extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    private LocalTime scheduleStartTime;
+    @Column(nullable = false)
+    private String userId;
 
-    private LocalTime scheduleEndTime;
+    @Builder.Default
+    private LocalTime scheduleStartTime = LocalTime.MIN;
+
+    @Builder.Default
+    private LocalTime scheduleEndTime= LocalTime.MAX;
 
     @OneToMany(mappedBy="project", fetch = FetchType.LAZY)
 //    @JoinColumns(value = {}, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))

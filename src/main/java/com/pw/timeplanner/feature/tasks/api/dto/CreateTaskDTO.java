@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -29,5 +30,12 @@ public class CreateTaskDTO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     LocalTime startTime;
 
+    @Schema(nullable = true)
     Integer durationMin;
+
+    @Schema(nullable = true)
+    PriorityDTO priority;
+
+    @Schema(nullable = true)
+    UUID projectId;
 }

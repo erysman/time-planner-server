@@ -123,10 +123,12 @@ public class ScheduleService {
 
     public void revokeSchedule(String userId, LocalDate day) {
         List<TaskEntity> taskEntities = tasksRepository.findAllByUserIdAndStartDay(userId, day);
-        taskEntities.stream().filter(TaskEntity::getAutoScheduled).forEach(taskEntity -> {
-            orderService.updateDayOrder(userId, taskEntity, null, JsonNullable.of(null));
-            taskEntity.setStartTime(null);
-            taskEntity.setAutoScheduled(false);
-        });
+        taskEntities.stream()
+                .filter(TaskEntity::getAutoScheduled)
+                .forEach(taskEntity -> {
+                    orderService.updateDayOrder(userId, taskEntity, null, JsonNullable.of(null));
+                    taskEntity.setStartTime(null);
+                    taskEntity.setAutoScheduled(false);
+                });
     }
 }
