@@ -2,7 +2,7 @@ package com.pw.timeplanner.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pw.timeplanner.feature.tasks.api.dto.TaskUpdateDTO;
+import com.pw.timeplanner.feature.tasks.api.dto.UpdateTaskDTO;
 import org.junit.jupiter.api.Test;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +40,9 @@ class JacksonConfigTest {
 
     @Test
     void should_use_json_nullable_module() throws JsonProcessingException {
-        assertEquals(JsonNullable.of(LocalDate.of(2023, 11, 30)), mapper.readValue("{\"startDate\":\"2023-11-30\"}", TaskUpdateDTO.class).getStartDay());
-        assertEquals(JsonNullable.of(null), mapper.readValue("{\"startDate\":null}", TaskUpdateDTO.class).getStartDay());
-        assertEquals(JsonNullable.of(LocalTime.of(11, 11, 30)), mapper.readValue("{\"startTime\":\"11:11:30\"}", TaskUpdateDTO.class).getStartTime());
-        assertNull(mapper.readValue("{}", TaskUpdateDTO.class).getStartDay());
+        assertEquals(JsonNullable.of(LocalDate.of(2023, 11, 30)), mapper.readValue("{\"startDate\":\"2023-11-30\"}", UpdateTaskDTO.class).getStartDay());
+        assertEquals(JsonNullable.of(null), mapper.readValue("{\"startDate\":null}", UpdateTaskDTO.class).getStartDay());
+        assertEquals(JsonNullable.of(LocalTime.of(11, 11, 30)), mapper.readValue("{\"startTime\":\"11:11:30\"}", UpdateTaskDTO.class).getStartTime());
+        assertNull(mapper.readValue("{}", UpdateTaskDTO.class).getStartDay());
     }
 }

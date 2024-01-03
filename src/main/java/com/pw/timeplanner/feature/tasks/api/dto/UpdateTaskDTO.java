@@ -18,7 +18,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskUpdateDTO implements Serializable {
+public class UpdateTaskDTO implements Serializable {
     @NullOrNotBlank
     String name;
 

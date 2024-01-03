@@ -1,8 +1,8 @@
 package com.pw.timeplanner.feature.tasks.api;
 
-import com.pw.timeplanner.feature.tasks.api.dto.CreateTaskDTO;
-import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
-import com.pw.timeplanner.feature.tasks.api.dto.UpdateTaskDTO;
+import com.pw.timeplanner.feature.tasks.api.projectDto.CreateProjectDTO;
+import com.pw.timeplanner.feature.tasks.api.projectDto.ProjectDTO;
+import com.pw.timeplanner.feature.tasks.api.projectDto.UpdateProjectDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -14,42 +14,39 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 //@Validated
-@RequestMapping(TasksResource.RESOURCE_PATH)
-public interface TasksResource {
+@RequestMapping(ProjectsResource.RESOURCE_PATH)
+public interface ProjectsResource {
 
-    String RESOURCE_PATH = "/tasks";
+    String RESOURCE_PATH = "/projects";
 
     @GetMapping
-    @Operation(summary = "Get tasks", responses = {
+    @Operation(summary = "Get projects", responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
-    List<TaskDTO> getTasks(JwtAuthenticationToken authentication,
-                           @RequestParam("day") LocalDate day);
+    List<ProjectDTO> getProjects(JwtAuthenticationToken authentication);
 
     @GetMapping("/{id}")
-    Optional<TaskDTO> getTask(JwtAuthenticationToken authentication,
+    Optional<ProjectDTO> getProject(JwtAuthenticationToken authentication,
                               @PathVariable("id") UUID id);
 
     @DeleteMapping("/{id}")
-    void deleteTask(JwtAuthenticationToken authentication,
+    void deleteProject(JwtAuthenticationToken authentication,
                               @PathVariable("id") UUID id);
 
     @PatchMapping("/{id}")
-    Optional<TaskDTO> updateTask(JwtAuthenticationToken authentication,
+    Optional<ProjectDTO> updateProject(JwtAuthenticationToken authentication,
                        @PathVariable("id") UUID id,
-                       @RequestBody @Validated UpdateTaskDTO updateTaskDTO);
+                       @RequestBody @Validated UpdateProjectDTO updateProjectDTO);
 
     @PostMapping
-    Optional<TaskDTO> createTask(JwtAuthenticationToken authentication,
-                                 @RequestBody @Validated CreateTaskDTO createTaskDTO);
+    ProjectDTO createProject(JwtAuthenticationToken authentication,
+                                 @RequestBody @Validated CreateProjectDTO createProjectDTO);
 
 }

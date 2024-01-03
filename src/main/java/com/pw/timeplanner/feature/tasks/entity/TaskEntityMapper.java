@@ -4,7 +4,7 @@ import com.pw.timeplanner.core.entity.JsonNullableMapper;
 import com.pw.timeplanner.feature.tasks.api.dto.CreateTaskDTO;
 import com.pw.timeplanner.feature.tasks.api.dto.PriorityDTO;
 import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
-import com.pw.timeplanner.feature.tasks.api.dto.TaskUpdateDTO;
+import com.pw.timeplanner.feature.tasks.api.dto.UpdateTaskDTO;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -50,7 +50,7 @@ public interface TaskEntityMapper {
     @Mapping(target = "scheduleRunId", ignore = true)
     @Mapping(source = "priority", target = "priority")
     @Mapping(target = "project", ignore = true)
-    void update(TaskUpdateDTO update, @MappingTarget TaskEntity entity);
+    void update(UpdateTaskDTO update, @MappingTarget TaskEntity entity);
 
 
     default UUID map(ProjectEntity project) {
