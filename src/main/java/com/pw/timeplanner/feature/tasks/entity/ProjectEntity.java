@@ -31,6 +31,8 @@ public class ProjectEntity extends BaseEntity {
     @Column(nullable = false)
     private String userId;
 
+    private String color;
+
     @Builder.Default
     private LocalTime scheduleStartTime = LocalTime.MIN;
 
@@ -38,6 +40,5 @@ public class ProjectEntity extends BaseEntity {
     private LocalTime scheduleEndTime= LocalTime.MAX;
 
     @OneToMany(mappedBy="project", fetch = FetchType.LAZY)
-//    @JoinColumns(value = {}, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private Set<TaskEntity> tasks;
 }

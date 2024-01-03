@@ -3,7 +3,7 @@ package com.pw.timeplanner.feature.tasks.service;
 import com.pw.timeplanner.config.TasksProperties;
 import com.pw.timeplanner.feature.tasks.api.dto.CreateTaskDTO;
 import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
-import com.pw.timeplanner.feature.tasks.api.dto.TaskUpdateDTO;
+import com.pw.timeplanner.feature.tasks.api.dto.UpdateTaskDTO;
 import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntityMapper;
@@ -92,19 +92,19 @@ public class TasksService {
         return true;
     }
 
-    public Optional<TaskDTO> updateTask(String userId, UUID taskId, TaskUpdateDTO taskUpdateDTO) {
-        log.info("Updating task " + taskId + " with: " + taskUpdateDTO);
+    public Optional<TaskDTO> updateTask(String userId, UUID taskId, UpdateTaskDTO updateTaskDTO) {
+        log.info("Updating task " + taskId + " with: " + updateTaskDTO);
         Optional<TaskEntity> entity = tasksRepository.lockAndFindOneByUserIdAndId(userId, taskId);
         if (entity.isEmpty()) {
             return Optional.empty();
         }
         TaskEntity task = entity.get();
-        tasksValidator.validateUpdate(taskUpdateDTO, task);
-        if (taskUpdateDTO.getStartTime() != null || taskUpdateDTO.getStartDay() != null) {
-            tasksOrderService.updateDayOrder(userId, task, taskUpdateDTO.getStartDay(), taskUpdateDTO.getStartTime());
+        tasksValidator.validateUpdate(updateTaskDTO, task);
+        if (updateTaskDTO.getStartTime() != null || updateTaskDTO.getStartDay() != null) {
+            tasksOrderService.updateDayOrder(userId, task, updateTaskDTO.getStartDay(), updateTaskDTO.getStartTime());
             task.setAutoScheduled(false);
         }
-        mapper.update(taskUpdateDTO, task);
+        mapper.update(updateTaskDTO, task);
         return Optional.of(mapper.toDTO(task));
     }
 

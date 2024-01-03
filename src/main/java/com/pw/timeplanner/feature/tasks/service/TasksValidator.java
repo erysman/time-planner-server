@@ -2,7 +2,7 @@ package com.pw.timeplanner.feature.tasks.service;
 
 import com.pw.timeplanner.config.TasksProperties;
 import com.pw.timeplanner.feature.tasks.api.dto.CreateTaskDTO;
-import com.pw.timeplanner.feature.tasks.api.dto.TaskUpdateDTO;
+import com.pw.timeplanner.feature.tasks.api.dto.UpdateTaskDTO;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
 import com.pw.timeplanner.feature.tasks.service.exceptions.NullDurationMinException;
 import com.pw.timeplanner.feature.tasks.service.exceptions.TimeGranularityException;
@@ -23,7 +23,7 @@ public class TasksValidator {
 //        this.validateTimeGranularity(createTaskDTO);
     }
 
-    public void validateUpdate(TaskUpdateDTO taskUpdateDTO, TaskEntity existingEntity) {
+    public void validateUpdate(UpdateTaskDTO updateTaskDTO, TaskEntity existingEntity) {
         /*TODO
             throw if:
                 updateStartTime is present and not null
@@ -31,13 +31,13 @@ public class TasksValidator {
                 updateStartTime is not present and existingStartTime is not null
                     and updateDuration is present and null
          */
-        boolean isStartTimeUpdatedToNonNull = isPresentAndNotNull(taskUpdateDTO.getStartTime())
-                && (isPresentAndNull(taskUpdateDTO.getDurationMin())
-                    || taskUpdateDTO.getDurationMin() == null
+        boolean isStartTimeUpdatedToNonNull = isPresentAndNotNull(updateTaskDTO.getStartTime())
+                && (isPresentAndNull(updateTaskDTO.getDurationMin())
+                    || updateTaskDTO.getDurationMin() == null
                     && existingEntity.getDurationMin() == null);
-        boolean isStartTimeNotUpdatedToNull = taskUpdateDTO.getStartTime() == null
+        boolean isStartTimeNotUpdatedToNull = updateTaskDTO.getStartTime() == null
                 && existingEntity.getStartTime() != null
-                && isPresentAndNull(taskUpdateDTO.getDurationMin());
+                && isPresentAndNull(updateTaskDTO.getDurationMin());
         if (isStartTimeUpdatedToNonNull
                 || isStartTimeNotUpdatedToNull
         ) {
@@ -62,12 +62,12 @@ public class TasksValidator {
         validateTimeGranularity(createTaskDTO.getDurationMin(), "durationMin");
     }
 
-    private void validateTimeGranularity(TaskUpdateDTO taskUpdateDTO) {
-        if (isPresentAndNotNull(taskUpdateDTO.getStartTime())) {
-            validateTimeGranularity(taskUpdateDTO.getStartTime().get().getMinute(), "startTime");
+    private void validateTimeGranularity(UpdateTaskDTO updateTaskDTO) {
+        if (isPresentAndNotNull(updateTaskDTO.getStartTime())) {
+            validateTimeGranularity(updateTaskDTO.getStartTime().get().getMinute(), "startTime");
         }
-        if (isPresentAndNotNull(taskUpdateDTO.getDurationMin())) {
-            validateTimeGranularity(taskUpdateDTO.getDurationMin().get(), "durationMin");
+        if (isPresentAndNotNull(updateTaskDTO.getDurationMin())) {
+            validateTimeGranularity(updateTaskDTO.getDurationMin().get(), "durationMin");
         }
     }
 
