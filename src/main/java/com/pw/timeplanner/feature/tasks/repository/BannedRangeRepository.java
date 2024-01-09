@@ -14,4 +14,5 @@ public interface BannedRangeRepository extends JpaRepository<BannedRangeEntity, 
 //    @Lock(LockModeType.PESSIMISTIC_WRITE)
 //    List<TaskEntity> findAllByUserIdAndStartDay(@Param("userId") String userId, @Param("startDay") LocalDate startDay);
 
+//    List<BannedRangeEntity> findAll();
 }

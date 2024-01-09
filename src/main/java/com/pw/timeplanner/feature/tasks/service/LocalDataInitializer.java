@@ -4,6 +4,7 @@ import com.pw.timeplanner.config.TasksProperties;
 import com.pw.timeplanner.feature.tasks.entity.Priority;
 import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
+import com.pw.timeplanner.feature.tasks.repository.BannedRangeRepository;
 import com.pw.timeplanner.feature.tasks.repository.ProjectsRepository;
 import com.pw.timeplanner.feature.tasks.repository.TasksRepository;
 import jakarta.annotation.PostConstruct;
@@ -26,6 +27,7 @@ public class LocalDataInitializer {
     private final TasksProperties properties;
     private final TasksRepository tasksRepository;
     private final ProjectsRepository projectsRepository;
+    private final BannedRangeRepository bannedRangeRepository;
     private PlatformTransactionManager transactionManager;
 
 
@@ -100,6 +102,20 @@ public class LocalDataInitializer {
 //            e3.setProject(savedProject);
 //            e4.setProject(savedProject);
 //            e5.setProject(savedProject);
+            return "";
+        });
+        transactionTemplate.execute(status -> {
+//            BannedRangeEntity r1 = BannedRangeEntity.builder()
+//                    .startTime(LocalTime.MIN)
+//                    .endTime(LocalTime.of(8,0,0))
+//                    .build();
+//            BannedRangeEntity r2 = BannedRangeEntity.builder()
+//                    .startTime(LocalTime.of(22,0,0))
+//                    .endTime(LocalTime.MAX)
+//                    .build();
+//            bannedRangeRepository.save(r1);
+//            bannedRangeRepository.save(r2);
+
             return "";
         });
 

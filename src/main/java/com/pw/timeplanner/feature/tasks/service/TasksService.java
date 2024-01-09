@@ -70,7 +70,7 @@ public class TasksService {
         return projectEntity.orElseThrow(() -> new IllegalArgumentException("Project not found: " + projectId));
     }
 
-    public List<TaskDTO> getTasks(String userId, LocalDate startDate) {
+    public List<TaskDTO> getTasksByDate(String userId, LocalDate startDate) {
         return tasksRepository.findAllByUserIdAndStartDay(userId, startDate)
                 .stream()
                 .map(mapper::toDTO)
