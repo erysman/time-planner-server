@@ -1,6 +1,7 @@
 package com.pw.timeplanner.feature.tasks.controller;
 
 import com.pw.timeplanner.feature.tasks.api.ProjectsResource;
+import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
 import com.pw.timeplanner.feature.tasks.api.projectDto.CreateProjectDTO;
 import com.pw.timeplanner.feature.tasks.api.projectDto.ProjectDTO;
 import com.pw.timeplanner.feature.tasks.api.projectDto.UpdateProjectDTO;
@@ -27,6 +28,12 @@ public class ProjectController implements ProjectsResource {
     public List<ProjectDTO> getProjects(JwtAuthenticationToken authentication) {
         String userId = getUserIdFromToken(authentication);
         return projectService.getProjects(userId);
+    }
+
+    @Override
+    public List<TaskDTO> getProjectTasks(JwtAuthenticationToken authentication, UUID id) {
+        String userId = getUserIdFromToken(authentication);
+        return projectService.getProjectTasks(userId, id);
     }
 
     @Override

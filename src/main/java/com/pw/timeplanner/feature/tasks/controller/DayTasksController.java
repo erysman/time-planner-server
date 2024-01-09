@@ -32,7 +32,7 @@ public class DayTasksController implements DayTasksResource {
     public List<TaskDTO> getDayTasks(JwtAuthenticationToken authentication, @DateTimeFormat LocalDate day) {
         String userId = authentication.getToken().getClaim("user_id");
         //TODO: userId must be present, throw if not
-        return tasksService.getTasks(userId, day);
+        return tasksService.getTasksByDate(userId, day);
     }
 
     @Override

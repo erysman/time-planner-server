@@ -1,6 +1,7 @@
 package com.pw.timeplanner.feature.tasks.service;
 
 import com.pw.timeplanner.client.SchedulerClient;
+import com.pw.timeplanner.client.model.BannedRange;
 import com.pw.timeplanner.client.model.Project;
 import com.pw.timeplanner.client.model.ScheduleTasksResponse;
 import com.pw.timeplanner.client.model.ScheduledTask;
@@ -66,11 +67,19 @@ public class ScheduleService {
                         .id(e.getId())
                         .name(e.getName())
                         .timeRangeStart(timeToNumber(e.getScheduleStartTime()))
-                        .timeRangeEnd(getTimeRangeEnd(e))
+                        .timeRangeEnd(getTimeRangeEnd(e.getScheduleEndTime()))
+                        .build())
+                .toList();
+        List<BannedRange> bannedRanges = bannedRangeRepository.findAll()
+                .stream()
+                .map(e -> BannedRange.builder()
+                        .id(e.getId())
+                        .timeRangeStart(timeToNumber(e.getStartTime()))
+                        .timeRangeEnd(getTimeRangeEnd(e.getEndTime()))
                         .build())
                 .toList();
         try {
-            ScheduleTasksResponse scheduledTasksResponse = client.scheduleTasks(tasks, projects, List.of());
+            ScheduleTasksResponse scheduledTasksResponse = client.scheduleTasks(tasks, projects, bannedRanges);
             List<ScheduledTask> scheduledTasks = scheduledTasksResponse.getScheduledTasks();
             UUID runId = scheduledTasksResponse.getRunId();
             scheduledTasks.forEach(scheduledTask -> {
@@ -108,12 +117,11 @@ public class ScheduleService {
         return LocalTime.of(time.intValue(), (int) minutes);
     }
 
-    private Double getTimeRangeEnd(ProjectEntity e) {
-        if (e.getScheduleEndTime()
-                .equals(LocalTime.MAX)) {
+    private Double getTimeRangeEnd(LocalTime end) {
+        if (end.getHour() == 23 && end.getMinute() == 59) {
             return 24.0;
         }
-        return timeToNumber(e.getScheduleEndTime());
+        return timeToNumber(end);
     }
 
     private double getDurationHours(TaskEntity e) {

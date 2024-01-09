@@ -1,10 +1,12 @@
 package com.pw.timeplanner.feature.tasks.service;
 
+import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
 import com.pw.timeplanner.feature.tasks.api.projectDto.CreateProjectDTO;
 import com.pw.timeplanner.feature.tasks.api.projectDto.ProjectDTO;
 import com.pw.timeplanner.feature.tasks.api.projectDto.UpdateProjectDTO;
 import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.ProjectEntityMapper;
+import com.pw.timeplanner.feature.tasks.entity.TaskEntityMapper;
 import com.pw.timeplanner.feature.tasks.repository.ProjectsRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class ProjectService {
 
     private final ProjectsRepository projectsRepository;
     private final ProjectEntityMapper mapper;
+    private final TaskEntityMapper taskMapper;
 
     public List<ProjectDTO> getProjects(String userId) {
         return projectsRepository.findAllByUserId(userId)
@@ -42,7 +45,7 @@ public class ProjectService {
 
     public Optional<ProjectDTO> updateProject(String userId, UUID projectId, UpdateProjectDTO updateProjectDTO) {
         Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId);
-        if(projectEntity.isEmpty()) return Optional.empty();
+        if (projectEntity.isEmpty()) return Optional.empty();
         ProjectEntity project = projectEntity.get();
         mapper.update(updateProjectDTO, project);
         return Optional.of(mapper.toDTO(project));
@@ -52,5 +55,14 @@ public class ProjectService {
         ProjectEntity entity = mapper.createEntity(createProjectDTO);
         entity.setUserId(userId);
         return mapper.toDTO(projectsRepository.save(entity));
+    }
+
+    public List<TaskDTO> getProjectTasks(String userId, UUID projectId) {
+        Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId);
+        return projectEntity.map(entity -> entity.getTasks()
+                        .stream()
+                        .map(taskMapper::toDTO)
+                        .toList())
+                .orElseGet(List::of);
     }
 }
