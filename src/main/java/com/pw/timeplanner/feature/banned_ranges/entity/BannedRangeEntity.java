@@ -1,6 +1,7 @@
-package com.pw.timeplanner.feature.tasks.entity;
+package com.pw.timeplanner.feature.banned_ranges.entity;
 
 import com.pw.timeplanner.core.entity.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -20,8 +21,13 @@ import java.time.LocalTime;
 @Table(name = "banned_range")
 public class BannedRangeEntity extends BaseEntity {
 
+    @Column(nullable = false)
     private LocalTime startTime;
 
+    @Column(nullable = false)
     private LocalTime endTime;
+
+    @Column(nullable = false)
+    private String userId;
 
 }

@@ -1,10 +1,11 @@
-package com.pw.timeplanner.feature.tasks.repository;
+package com.pw.timeplanner.feature.banned_ranges.repository;
 
 
-import com.pw.timeplanner.feature.tasks.entity.BannedRangeEntity;
+import com.pw.timeplanner.feature.banned_ranges.entity.BannedRangeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -15,4 +16,6 @@ public interface BannedRangeRepository extends JpaRepository<BannedRangeEntity, 
 //    List<TaskEntity> findAllByUserIdAndStartDay(@Param("userId") String userId, @Param("startDay") LocalDate startDay);
 
 //    List<BannedRangeEntity> findAll();
+
+    List<BannedRangeEntity> findAllByUserId(String userId);
 }
