@@ -19,6 +19,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import static com.pw.timeplanner.core.AuthUtils.getUserIdFromToken;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -30,20 +32,20 @@ public class DayTasksController implements DayTasksResource {
 
     @Override
     public List<TaskDTO> getDayTasks(JwtAuthenticationToken authentication, @DateTimeFormat LocalDate day) {
-        String userId = authentication.getToken().getClaim("user_id");
+        String userId = getUserIdFromToken(authentication);
         //TODO: userId must be present, throw if not
         return tasksService.getTasksByDate(userId, day);
     }
 
     @Override
     public List<UUID> getTasksDayOrder(JwtAuthenticationToken authentication, LocalDate day) {
-        String userId = authentication.getToken().getClaim("user_id");
+        String userId = getUserIdFromToken(authentication);
         return dayTasksService.getTasksOrder(userId, day);
     }
 
     @Override
     public List<UUID> updateTasksDayOrder(JwtAuthenticationToken authentication, LocalDate day, List<UUID> tasksOrder) {
-        String userId = authentication.getToken().getClaim("user_id");
+        String userId = getUserIdFromToken(authentication);
         try {
             return dayTasksService.updateTasksOrder(userId, day, tasksOrder);
         } catch (DataConflictException e) {
@@ -54,19 +56,19 @@ public class DayTasksController implements DayTasksResource {
 
     @Override
     public ScheduleInfoDTO getAutoScheduleInfo(JwtAuthenticationToken authentication, LocalDate day) {
-        String userId = authentication.getToken().getClaim("user_id");
+        String userId = getUserIdFromToken(authentication);
         return scheduleService.getInfo(userId, day);
     }
 
     @Override
     public void schedule(JwtAuthenticationToken authentication, LocalDate day) {
-        String userId = authentication.getToken().getClaim("user_id");
+        String userId = getUserIdFromToken(authentication);
         scheduleService.schedule(userId, day);
     }
 
     @Override
     public void revokeSchedule(JwtAuthenticationToken authentication, LocalDate day) {
-        String userId = authentication.getToken().getClaim("user_id");
+        String userId = getUserIdFromToken(authentication);
         scheduleService.revokeSchedule(userId, day);
     }
 }

@@ -1,10 +1,10 @@
 package com.pw.timeplanner.feature.tasks.service;
 
 import com.pw.timeplanner.config.TasksProperties;
+import com.pw.timeplanner.feature.banned_ranges.repository.BannedRangeRepository;
 import com.pw.timeplanner.feature.tasks.entity.Priority;
 import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
-import com.pw.timeplanner.feature.tasks.repository.BannedRangeRepository;
 import com.pw.timeplanner.feature.tasks.repository.ProjectsRepository;
 import com.pw.timeplanner.feature.tasks.repository.TasksRepository;
 import jakarta.annotation.PostConstruct;

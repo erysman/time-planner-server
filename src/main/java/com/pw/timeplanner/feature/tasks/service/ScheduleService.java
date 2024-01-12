@@ -7,11 +7,10 @@ import com.pw.timeplanner.client.model.ScheduleTasksResponse;
 import com.pw.timeplanner.client.model.ScheduledTask;
 import com.pw.timeplanner.client.model.Task;
 import com.pw.timeplanner.config.TasksProperties;
+import com.pw.timeplanner.feature.banned_ranges.service.BannedRangesService;
 import com.pw.timeplanner.feature.tasks.api.dto.ScheduleInfoDTO;
 import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
-import com.pw.timeplanner.feature.tasks.repository.BannedRangeRepository;
-import com.pw.timeplanner.feature.tasks.repository.ProjectsRepository;
 import com.pw.timeplanner.feature.tasks.repository.TasksRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -33,8 +32,7 @@ public class ScheduleService {
 
     private final TasksOrderService orderService;
     private final TasksRepository tasksRepository;
-    private final ProjectsRepository projectsRepository;
-    private final BannedRangeRepository bannedRangeRepository;
+    private final BannedRangesService bannedRangesService;
     private final SchedulerClient client;
     private final TasksProperties properties;
 
@@ -70,7 +68,7 @@ public class ScheduleService {
                         .timeRangeEnd(getTimeRangeEnd(e.getScheduleEndTime()))
                         .build())
                 .toList();
-        List<BannedRange> bannedRanges = bannedRangeRepository.findAll()
+        List<BannedRange> bannedRanges = bannedRangesService.getBannedRanges(userId)
                 .stream()
                 .map(e -> BannedRange.builder()
                         .id(e.getId())
