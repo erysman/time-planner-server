@@ -17,6 +17,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Optional;
 
 @Component
 @AllArgsConstructor
@@ -38,25 +39,30 @@ public class LocalDataInitializer {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
         transactionTemplate.execute(status -> {
+            Optional<ProjectEntity> defaultProject = projectsRepository.findOneByUserIdAndName(userId,
+                    properties.getDefaultProjectName());
+            ProjectEntity p1 = defaultProject.orElseGet(() -> {
+                log.info("Initializing default project for user: {}", userId);
+                ProjectEntity newProject = ProjectEntity.builder()
+                        .name(properties.getDefaultProjectName())
+                        .userId(userId)
+                        .scheduleStartTime(LocalTime.of(0, 0, 0))
+                        .scheduleEndTime(LocalTime.of(23, 59, 59))
+                        .build();
+                return projectsRepository.save(newProject);
+            });
             if (!tasksRepository.findAllByUserIdAndStartDay(userId, now)
                     .isEmpty()) {
                 return "";
             }
             log.info("Initializing db with mocked entities for day: {}", now);
-            ProjectEntity p1 = ProjectEntity.builder()
-                    .name(properties.getDefaultProjectName())
-                    .userId(userId)
-                    .scheduleStartTime(LocalTime.of(0, 0, 0))
-                    .scheduleEndTime(LocalTime.of(23, 59, 59))
-                    .build();
-            ProjectEntity savedProject = projectsRepository.save(p1);
             TaskEntity e1 = TaskEntity.builder()
                     .userId(userId)
                     .name("Sprzątanie")
                     .startDay(LocalDate.now())
                     .dayOrder(1)
                     .priority(Priority.NORMAL)
-                    .project(savedProject)
+                    .project(p1)
                     .build();
             TaskEntity e4 = TaskEntity.builder()
                     .userId(userId)
@@ -64,7 +70,7 @@ public class LocalDataInitializer {
                     .startDay(LocalDate.now())
                     .dayOrder(2)
                     .priority(Priority.IMPORTANT)
-                    .project(savedProject)
+                    .project(p1)
                     .build();
             TaskEntity e5 = TaskEntity.builder()
                     .userId(userId)
@@ -72,7 +78,7 @@ public class LocalDataInitializer {
                     .startDay(LocalDate.now())
                     .dayOrder(0)
                     .priority(Priority.IMPORTANT)
-                    .project(savedProject)
+                    .project(p1)
                     .build();
             TaskEntity e2 = TaskEntity.builder()
                     .userId(userId)
@@ -81,7 +87,7 @@ public class LocalDataInitializer {
                     .startTime(LocalTime.of(9, 0, 0))
                     .durationMin(60)
                     .priority(Priority.NORMAL)
-                    .project(savedProject)
+                    .project(p1)
                     .build();
             TaskEntity e3 = TaskEntity.builder()
                     .userId(userId)
@@ -90,18 +96,13 @@ public class LocalDataInitializer {
                     .startTime(LocalTime.of(10, 15, 0))
                     .durationMin(120)
                     .priority(Priority.NORMAL)
-                    .project(savedProject)
+                    .project(p1)
                     .build();
             tasksRepository.save(e1);
             tasksRepository.save(e2);
             tasksRepository.save(e3);
             tasksRepository.save(e4);
             tasksRepository.save(e5);
-//            e1.setProject(savedProject);
-//            e2.setProject(savedProject);
-//            e3.setProject(savedProject);
-//            e4.setProject(savedProject);
-//            e5.setProject(savedProject);
             return "";
         });
         transactionTemplate.execute(status -> {

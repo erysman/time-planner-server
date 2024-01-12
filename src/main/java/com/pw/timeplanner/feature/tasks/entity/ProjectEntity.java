@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +26,7 @@ import java.util.Set;
 @Table(name = "project")
 public class ProjectEntity extends BaseEntity {
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique=true)
     private String name;
 
     @Column(nullable = false)
@@ -40,5 +41,6 @@ public class ProjectEntity extends BaseEntity {
     private LocalTime scheduleEndTime= LocalTime.MAX;
 
     @OneToMany(mappedBy="project", fetch = FetchType.LAZY)
+    @OrderBy("priority DESC, name ASC")
     private Set<TaskEntity> tasks;
 }
