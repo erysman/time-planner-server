@@ -4,7 +4,7 @@ features:
     min-duration-minutes: 30
     default-duration-minutes: 60
     default-project-name: inbox
-    default-project-color: #1632e5
+    default-project-color: "#1632e5"
 
 #com:
 #  pw:
