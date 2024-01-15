@@ -25,7 +25,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "project", uniqueConstraints = {@UniqueConstraint(columnNames = { "name", "userId" })})
+@Table(name = "project", uniqueConstraints = {@UniqueConstraint(name = "UniqueNameAndUserId",columnNames = { "name", "user_id" })})
 public class ProjectEntity extends BaseEntity {
     public ProjectEntity(ProjectEntity entity) {
         this.name = entity.name;
