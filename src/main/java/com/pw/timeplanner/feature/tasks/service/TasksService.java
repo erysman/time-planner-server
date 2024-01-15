@@ -54,15 +54,7 @@ public class TasksService {
     private ProjectEntity getDefaultProject(String userId) {
         Optional<ProjectEntity> defaultProjectEntity = projectsRepository.findOneByUserIdAndName(userId,
                 properties.getDefaultProjectName());
-        return defaultProjectEntity.orElseGet(() -> saveDefaultProject(userId));
-    }
-
-    private ProjectEntity saveDefaultProject(String userId) {
-        ProjectEntity defaultProject = ProjectEntity.builder()
-                .name(properties.getDefaultProjectName())
-                .userId(userId)
-                .build();
-        return projectsRepository.save(defaultProject);
+        return defaultProjectEntity.orElseThrow();
     }
 
     private ProjectEntity getProjectById(String userId, UUID projectId) {

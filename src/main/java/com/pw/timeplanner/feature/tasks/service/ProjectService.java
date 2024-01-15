@@ -1,5 +1,6 @@
 package com.pw.timeplanner.feature.tasks.service;
 
+import com.pw.timeplanner.config.TasksProperties;
 import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
 import com.pw.timeplanner.feature.tasks.api.projectDto.CreateProjectDTO;
 import com.pw.timeplanner.feature.tasks.api.projectDto.ProjectDTO;
@@ -26,6 +27,7 @@ public class ProjectService {
     private final ProjectsRepository projectsRepository;
     private final ProjectEntityMapper mapper;
     private final TaskEntityMapper taskMapper;
+    private final TasksProperties properties;
 
     public List<ProjectDTO> getProjects(String userId) {
         return projectsRepository.findAllByUserId(userId)
@@ -39,8 +41,40 @@ public class ProjectService {
         return projectEntity.map(mapper::toDTO);
     }
 
+    public Optional<ProjectDTO> getDefaultProject(String userId) {
+        Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndName(userId,
+                properties.getDefaultProjectName());
+        return projectEntity.map(mapper::toDTO);
+    }
+
+    public ProjectDTO createDefaultProject(String userId) {
+        Optional<ProjectDTO> existingDefaultProject = this.getDefaultProject(userId);
+        if (existingDefaultProject.isPresent()) {
+            return existingDefaultProject.get();
+        }
+        ProjectEntity defaultProject = ProjectEntity.builder()
+                .name(properties.getDefaultProjectName())
+                .userId(userId)
+                .color(properties.getDefaultProjectColor())
+                .build();
+        return mapper.toDTO(projectsRepository.save(defaultProject));
+    }
+
     public void deleteProject(String userId, UUID projectId) {
-        projectsRepository.deleteByUserIdAndId(userId, projectId);
+        Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId);
+        Optional<Boolean> existsAndIsDefaultProject = projectEntity.map(p -> p.getName()
+                .equals(properties.getDefaultProjectName()));
+        existsAndIsDefaultProject.ifPresent(isDefaultProject -> {
+            if (isDefaultProject) {
+                ProjectEntity copy = new ProjectEntity(projectEntity.get());
+                projectEntity.ifPresent(projectsRepository::delete);
+                projectsRepository.flush();
+                projectsRepository.save(copy);
+                return;
+            }
+            projectEntity.ifPresent(projectsRepository::delete);
+        });
+
     }
 
     public Optional<ProjectDTO> updateProject(String userId, UUID projectId, UpdateProjectDTO updateProjectDTO) {
