@@ -2,8 +2,9 @@ features:
   tasks:
     time-granularity-minutes: 15
     min-duration-minutes: 30
-    defaultDurationMinutes: 60
-    defaultProjectName: inbox
+    default-duration-minutes: 60
+    default-project-name: inbox
+    default-project-color: #1632e5
 
 #com:
 #  pw:

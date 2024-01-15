@@ -6,7 +6,6 @@ import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
 import com.pw.timeplanner.feature.tasks.repository.ProjectsRepository;
 import com.pw.timeplanner.feature.tasks.repository.TasksRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -31,7 +30,7 @@ public class LocalDataInitializer {
     private PlatformTransactionManager transactionManager;
 
 
-    @PostConstruct
+//    @PostConstruct
     public void initData() {
         String userId = "oNK797T3SAfA0Z4nvy8oFWR7WOi2";
         LocalDate now = LocalDate.now();

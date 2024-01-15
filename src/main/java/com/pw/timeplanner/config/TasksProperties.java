@@ -12,4 +12,5 @@ public class TasksProperties {
     Integer minDurationMinutes;
     Integer defaultDurationMinutes;
     String defaultProjectName;
+    String defaultProjectColor;
 }

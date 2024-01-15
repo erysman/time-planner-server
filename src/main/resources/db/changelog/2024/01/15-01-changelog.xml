@@ -7,7 +7,7 @@
         objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
     <property name="uuid.type" value="binary(16)" dbms="mysql"/>
     <property name="uuid.type" value="UUID" dbms="postgresql"/>
-    <changeSet id="1705083405377-1" author="erysman (generated)">
+    <changeSet id="1705354551140-1" author="erysman (generated)">
         <createTable tableName="banned_range">
             <column name="id" type="${uuid.type}">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_banned_range"/>
@@ -29,7 +29,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1705083405377-2" author="erysman (generated)">
+    <changeSet id="1705354551140-2" author="erysman (generated)">
         <createTable tableName="project">
             <column name="id" type="${uuid.type}">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_project"/>
@@ -51,7 +51,7 @@
             <column name="schedule_end_time" type="TIME"/>
         </createTable>
     </changeSet>
-    <changeSet id="1705083405377-3" author="erysman (generated)">
+    <changeSet id="1705354551140-3" author="erysman (generated)">
         <createTable tableName="task">
             <column name="id" type="${uuid.type}">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_task"/>
@@ -81,8 +81,8 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1705083405377-4" author="erysman (generated)">
-        <addUniqueConstraint columnNames="name" constraintName="uc_project_name" tableName="project"/>
+    <changeSet id="1705354551140-4" author="erysman (generated)">
+        <addUniqueConstraint columnNames="name" constraintName="uc_d636101c78f000763c15a877b" tableName="project"/>
     </changeSet>
 
 </databaseChangeLog>
