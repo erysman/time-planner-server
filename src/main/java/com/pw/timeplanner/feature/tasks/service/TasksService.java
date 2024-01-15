@@ -104,6 +104,10 @@ public class TasksService {
             tasksOrderService.updateDayOrder(userId, task, updateTaskDTO.getStartDay(), updateTaskDTO.getStartTime());
             task.setAutoScheduled(false);
         }
+        if(updateTaskDTO.getProjectId() != null) {
+            Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndId(userId, updateTaskDTO.getProjectId());
+            projectEntity.ifPresent(task::setProject);
+        }
         mapper.update(updateTaskDTO, task);
         return Optional.of(mapper.toDTO(task));
     }

@@ -2,6 +2,8 @@ package com.pw.timeplanner.feature.banned_ranges.service;
 
 import com.pw.timeplanner.feature.banned_ranges.api.dto.BannedRangeDTO;
 import com.pw.timeplanner.feature.banned_ranges.api.dto.CreateBannedRangeDTO;
+import com.pw.timeplanner.feature.banned_ranges.entity.BannedRangeEntity;
+import com.pw.timeplanner.feature.banned_ranges.entity.BannedRangeEntityMapper;
 import com.pw.timeplanner.feature.banned_ranges.repository.BannedRangeRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,20 +19,28 @@ import java.util.UUID;
 public class BannedRangesService {
 
     private final BannedRangeRepository repository;
+    private final BannedRangeEntityMapper mapper;
+
     public List<BannedRangeDTO> getBannedRanges(String userId) {
-//        return repository.findAllByUserId(userId);
-        return List.of();
+        return repository.findAllByUserId(userId)
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
     }
 
     public Optional<BannedRangeDTO> getBannedRange(String userId, UUID id) {
-        return Optional.empty();
+        Optional<BannedRangeEntity> bannedRangeEntity = repository.findByUserIdAndId(userId, id);
+        return bannedRangeEntity.map(mapper::toDTO);
     }
 
     public void deleteBannedRange(String userId, UUID id) {
-
+        Optional<BannedRangeEntity> bannedRangeEntity = repository.findByUserIdAndId(userId, id);
+        bannedRangeEntity.ifPresent(repository::delete);
     }
 
     public BannedRangeDTO createBannedRange(String userId, CreateBannedRangeDTO createBannedRangeDTO) {
-        return null;
+        BannedRangeEntity bannedRangeEntity = mapper.createEntity(createBannedRangeDTO);
+        bannedRangeEntity.setUserId(userId);
+        return mapper.toDTO(repository.save(bannedRangeEntity));
     }
 }

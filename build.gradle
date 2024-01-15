@@ -61,7 +61,7 @@ openApi {
 	apiDocsUrl.set("http://localhost:8080/api-docs")
 	outputDir.set(file("$buildDir/openapi"))
 	outputFileName.set("time-planner-server-openapi.json")
-	waitTimeInSeconds.set(15)
+	waitTimeInSeconds.set(30)
 /*
 	groupedApiMappings.set(["https://localhost:8080/v3/api-docs/groupA" to "swagger-groupA.json",
 							"https://localhost:8080/v3/api-docs/groupB" to "swagger-groupB.json"])

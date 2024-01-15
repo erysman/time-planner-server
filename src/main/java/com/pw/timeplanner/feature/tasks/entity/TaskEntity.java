@@ -48,14 +48,23 @@ public class TaskEntity extends BaseEntity {
     @Column(columnDefinition = "boolean default false")
     private Boolean autoScheduled = false;
 
-    private Priority priority;
+    @Builder.Default
+    private Boolean isImportant = false;
+    @Builder.Default
+    private Boolean isUrgent = false;
 
     private UUID scheduleRunId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns(value = {
-            @JoinColumn(name="project_id", nullable = false)
-    }, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumns(value = {@JoinColumn(name = "project_id", nullable = false)}, foreignKey = @ForeignKey(value =
+            ConstraintMode.NO_CONSTRAINT))
     private ProjectEntity project;
+
+    public Priority getPriority() {
+        if (isImportant && isUrgent) return Priority.IMPORTANT_URGENT;
+        if (isImportant) return Priority.IMPORTANT;
+        if (isUrgent) return Priority.URGENT;
+        return Priority.NORMAL;
+    }
 }
 

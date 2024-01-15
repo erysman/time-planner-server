@@ -41,6 +41,6 @@ public class ProjectEntity extends BaseEntity {
     private LocalTime scheduleEndTime= LocalTime.MAX;
 
     @OneToMany(mappedBy="project", fetch = FetchType.LAZY)
-    @OrderBy("priority DESC, name ASC")
+    @OrderBy("isImportant DESC, isUrgent DESC, name ASC")
     private Set<TaskEntity> tasks;
 }

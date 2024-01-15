@@ -30,7 +30,8 @@ public class TaskDTO implements Serializable {
     @Schema(nullable = true)
     Integer durationMin;
 
-    PriorityDTO priority;
+    Boolean isImportant;
+    Boolean isUrgent;
 
     UUID projectId;
 }
