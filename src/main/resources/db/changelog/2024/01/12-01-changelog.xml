@@ -7,7 +7,7 @@
         objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
     <property name="uuid.type" value="binary(16)" dbms="mysql"/>
     <property name="uuid.type" value="UUID" dbms="postgresql"/>
-    <changeSet id="1704879493417-1" author="erysman (generated)">
+    <changeSet id="1705083405377-1" author="erysman (generated)">
         <createTable tableName="banned_range">
             <column name="id" type="${uuid.type}">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_banned_range"/>
@@ -18,11 +18,18 @@
             <column name="modified_date" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
-            <column name="start_time" type="TIME"/>
-            <column name="end_time" type="TIME"/>
+            <column name="start_time" type="TIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="TIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
-    <changeSet id="1704879493417-2" author="erysman (generated)">
+    <changeSet id="1705083405377-2" author="erysman (generated)">
         <createTable tableName="project">
             <column name="id" type="${uuid.type}">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_project"/>
@@ -44,7 +51,7 @@
             <column name="schedule_end_time" type="TIME"/>
         </createTable>
     </changeSet>
-    <changeSet id="1704879493417-3" author="erysman (generated)">
+    <changeSet id="1705083405377-3" author="erysman (generated)">
         <createTable tableName="task">
             <column name="id" type="${uuid.type}">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_task"/>
@@ -66,14 +73,15 @@
                 <constraints nullable="false"/>
             </column>
             <column defaultValueBoolean="false" name="auto_scheduled" type="boolean"/>
-            <column name="priority" type="INT"/>
+            <column name="is_important" type="BOOLEAN"/>
+            <column name="is_urgent" type="BOOLEAN"/>
             <column name="schedule_run_id" type="${uuid.type}"/>
             <column name="project_id" type="${uuid.type}">
                 <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1704879493417-4" author="erysman (generated)">
+    <changeSet id="1705083405377-4" author="erysman (generated)">
         <addUniqueConstraint columnNames="name" constraintName="uc_project_name" tableName="project"/>
     </changeSet>
 

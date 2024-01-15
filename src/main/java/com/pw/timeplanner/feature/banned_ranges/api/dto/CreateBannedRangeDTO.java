@@ -14,10 +14,10 @@ public class CreateBannedRangeDTO implements Serializable {
 
     @Schema(type = "String", pattern = "HH:mm")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    LocalTime scheduleStartTime;
+    LocalTime startTime;
 
     @Schema(type = "String", pattern = "HH:mm")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    LocalTime scheduleEndTime;
+    LocalTime endTime;
 
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -18,4 +19,6 @@ public interface BannedRangeRepository extends JpaRepository<BannedRangeEntity, 
 //    List<BannedRangeEntity> findAll();
 
     List<BannedRangeEntity> findAllByUserId(String userId);
+
+    Optional<BannedRangeEntity> findByUserIdAndId(String userId, UUID id);
 }

@@ -2,7 +2,6 @@ package com.pw.timeplanner.feature.tasks.service;
 
 import com.pw.timeplanner.config.TasksProperties;
 import com.pw.timeplanner.feature.banned_ranges.repository.BannedRangeRepository;
-import com.pw.timeplanner.feature.tasks.entity.Priority;
 import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
 import com.pw.timeplanner.feature.tasks.repository.ProjectsRepository;
@@ -46,6 +45,7 @@ public class LocalDataInitializer {
                 ProjectEntity newProject = ProjectEntity.builder()
                         .name(properties.getDefaultProjectName())
                         .userId(userId)
+                        .color("blue")
                         .scheduleStartTime(LocalTime.of(0, 0, 0))
                         .scheduleEndTime(LocalTime.of(23, 59, 59))
                         .build();
@@ -61,7 +61,6 @@ public class LocalDataInitializer {
                     .name("Sprzątanie")
                     .startDay(LocalDate.now())
                     .dayOrder(1)
-                    .priority(Priority.NORMAL)
                     .project(p1)
                     .build();
             TaskEntity e4 = TaskEntity.builder()
@@ -69,7 +68,7 @@ public class LocalDataInitializer {
                     .name("Nauka")
                     .startDay(LocalDate.now())
                     .dayOrder(2)
-                    .priority(Priority.IMPORTANT)
+                    .isImportant(true)
                     .project(p1)
                     .build();
             TaskEntity e5 = TaskEntity.builder()
@@ -77,7 +76,7 @@ public class LocalDataInitializer {
                     .name("Bieganie")
                     .startDay(LocalDate.now())
                     .dayOrder(0)
-                    .priority(Priority.IMPORTANT)
+                    .isImportant(true)
                     .project(p1)
                     .build();
             TaskEntity e2 = TaskEntity.builder()
@@ -86,7 +85,6 @@ public class LocalDataInitializer {
                     .startDay(LocalDate.now())
                     .startTime(LocalTime.of(9, 0, 0))
                     .durationMin(60)
-                    .priority(Priority.NORMAL)
                     .project(p1)
                     .build();
             TaskEntity e3 = TaskEntity.builder()
@@ -95,7 +93,6 @@ public class LocalDataInitializer {
                     .startDay(LocalDate.now())
                     .startTime(LocalTime.of(10, 15, 0))
                     .durationMin(120)
-                    .priority(Priority.NORMAL)
                     .project(p1)
                     .build();
             tasksRepository.save(e1);
