@@ -14,9 +14,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.pw.timeplanner.config.Constants.LOCAL_TIME_MAX;
 
 @Service
 @Slf4j
@@ -56,6 +59,8 @@ public class ProjectService {
                 .name(properties.getDefaultProjectName())
                 .userId(userId)
                 .color(properties.getDefaultProjectColor())
+                .scheduleStartTime(LocalTime.MIN)
+                .scheduleEndTime(LOCAL_TIME_MAX)
                 .build();
         return mapper.toDTO(projectsRepository.save(defaultProject));
     }
@@ -88,6 +93,12 @@ public class ProjectService {
     public ProjectDTO createProject(String userId, CreateProjectDTO createProjectDTO) {
         ProjectEntity entity = mapper.createEntity(createProjectDTO);
         entity.setUserId(userId);
+        if(entity.getScheduleStartTime() == null) {
+            entity.setScheduleStartTime(LocalTime.MIN);
+        }
+        if(entity.getScheduleEndTime() == null) {
+            entity.setScheduleEndTime(LOCAL_TIME_MAX);
+        }
         return mapper.toDTO(projectsRepository.save(entity));
     }
 

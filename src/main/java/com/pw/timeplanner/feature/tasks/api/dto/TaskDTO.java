@@ -3,6 +3,7 @@ package com.pw.timeplanner.feature.tasks.api.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Value;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Value
 @Builder
 public class TaskDTO implements Serializable {
+    @NotNull
     UUID id;
 
     @NotBlank
@@ -30,8 +32,10 @@ public class TaskDTO implements Serializable {
     @Schema(nullable = true)
     Integer durationMin;
 
+    @NotNull
     Boolean isImportant;
+    @NotNull
     Boolean isUrgent;
-
+    @NotNull
     UUID projectId;
 }

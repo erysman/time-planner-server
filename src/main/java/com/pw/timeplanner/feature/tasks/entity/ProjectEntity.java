@@ -10,7 +10,6 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -44,11 +43,8 @@ public class ProjectEntity extends BaseEntity {
 
     private String color;
 
-    @Builder.Default
-    private LocalTime scheduleStartTime = LocalTime.MIN;
-
-    @Builder.Default
-    private LocalTime scheduleEndTime= LocalTime.MAX;
+    private LocalTime scheduleStartTime;
+    private LocalTime scheduleEndTime;
 
     @OneToMany(mappedBy="project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     @OrderBy("isImportant DESC, isUrgent DESC, name ASC")
