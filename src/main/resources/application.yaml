@@ -1,13 +1,62 @@
+features:
+  tasks:
+    time-granularity-minutes: 15
+    min-duration-minutes: 30
+    default-duration-minutes: 60
+    default-project-name: inbox
+    default-project-color: "#1632e5"
+
+#com:
+#  pw:
+#    timeplanner:
+#      core:
+#        validation:
+#          NullOrNotBlank:
+#            message:
+#      feature:
+#        tasks:
+#          validation:
+#            NullOrGreaterThanMinimumDuration:
+#              message:
 server:
-  address: 0.0.0.0
+#  address: 0.0.0.0
+  port: ${PORT:8080}
+  error:
+    include-message: always
 spring:
+  mvc:
+    format:
+      date: yyyy-MM-dd
+      time: HH:mm:ss
+      date-time: iso
   application.name: time-planner-server
+  liquibase:
+    enabled: true
+#    change-log: config/liquibase/master.xml
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    generate-ddl: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        jdbc:
+          batch_size: 50
+          order_inserts: true
+          order_updates: true
+          batch_versioned_data: true
+        format_sql: true
+    show-sql: true
+
+  #        default_schema: time_planner
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://securetoken.google.com/time-planner-dc611
           jwk-set-uri: https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -21,3 +70,25 @@ management:
   endpoint:
     health:
       enabled: true
+
+#logging:
+#  level:
+#    com:
+#      pw:
+#        timeplanner:
+#          config:
+#            RequestLoggingFilter: DEBUG
+
+logging:
+  level:
+    org:
+      springframework:
+        transaction: TRACE
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+#              BasicBinder: TRACE
+      zalando:
+        logbook: TRACE
