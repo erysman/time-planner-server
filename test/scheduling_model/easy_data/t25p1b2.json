@@ -1,0 +1,47 @@
+{
+  "tasks": [
+    {"id": "T1", "name": "Task 1", "projectId": "P", "priority": 1, "startTime": null, "duration": 0.25},
+    {"id": "T2", "name": "Task 2", "projectId": "P", "priority": 2, "startTime": null, "duration": 1},
+    {"id": "T3", "name": "Task 3", "projectId": "P", "priority": 3, "startTime": null, "duration": 0.75},
+    {"id": "T4", "name": "Task 4", "projectId": "P", "priority": 4, "startTime": null, "duration": 0.5},
+    {"id": "T5", "name": "Task 5", "projectId": "P", "priority": 1, "startTime": null, "duration": 1.25},
+    {"id": "T6", "name": "Task 6", "projectId": "P", "priority": 2, "startTime": null, "duration": 1},
+    {"id": "T7", "name": "Task 7", "projectId": "P", "priority": 3, "startTime": null, "duration": 0.75},
+    {"id": "T8", "name": "Task 8", "projectId": "P", "priority": 4, "startTime": null, "duration": 0.5},
+    {"id": "T9", "name": "Task 9", "projectId": "P", "priority": 1, "startTime": null, "duration": 1},
+    {"id": "T10", "name": "Task 10", "projectId": "P", "priority": 2, "startTime": null, "duration": 1.25},
+    {"id": "T11", "name": "Task 11", "projectId": "P", "priority": 3, "startTime": null, "duration": 0.5},
+    {"id": "T12", "name": "Task 12", "projectId": "P", "priority": 4, "startTime": null, "duration": 0.25},
+    {"id": "T13", "name": "Task 13", "projectId": "P", "priority": 1, "startTime": null, "duration": 1},
+    {"id": "T14", "name": "Task 14", "projectId": "P", "priority": 2, "startTime": null, "duration": 0.75},
+    {"id": "T15", "name": "Task 15", "projectId": "P", "priority": 3, "startTime": null, "duration": 0.5},
+    {"id": "T16", "name": "Task 16", "projectId": "P", "priority": 4, "startTime": null, "duration": 1},
+    {"id": "T17", "name": "Task 17", "projectId": "P", "priority": 1, "startTime": null, "duration": 1.25},
+    {"id": "T18", "name": "Task 18", "projectId": "P", "priority": 2, "startTime": null, "duration": 0.75},
+    {"id": "T19", "name": "Task 19", "projectId": "P", "priority": 3, "startTime": null, "duration": 1},
+    {"id": "T20", "name": "Task 20", "projectId": "P", "priority": 4, "startTime": null, "duration": 0.5},
+    {"id": "T21", "name": "Task 21", "projectId": "P", "priority": 1, "startTime": null, "duration": 0.5},
+    {"id": "T22", "name": "Task 22", "projectId": "P", "priority": 2, "startTime": null, "duration": 1},
+    {"id": "T23", "name": "Task 23", "projectId": "P", "priority": 3, "startTime": null, "duration": 0.75},
+    {"id": "T24", "name": "Task 24", "projectId": "P", "priority": 4, "startTime": null, "duration": 1},
+    {"id": "T25", "name": "Task 25", "projectId": "P", "priority": 1, "startTime": null, "duration": 0.5}
+  ],
+  "projects": [
+    {
+      "timeRangeStart": 0.0,
+      "timeRangeEnd": 24.0,
+      "id": "P",
+      "name": "Project P"
+    }
+  ],
+  "bannedRanges": [ {
+    "timeRangeStart": 0.0,
+    "timeRangeEnd": 2.0,
+    "id": "R1"
+  },
+    {
+      "timeRangeStart": 22.0,
+      "timeRangeEnd": 24.0,
+      "id": "R2"
+    }]
+}

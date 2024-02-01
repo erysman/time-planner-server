@@ -1,0 +1,28 @@
+{
+  "tasks": [
+    {"id": "Task1", "name": "Task 1", "projectId": "Project1", "priority": 1, "startTime": null, "duration": 1},
+    {"id": "Task2", "name": "Task 2", "projectId": "Project1", "priority": 2, "startTime": null, "duration": 0.75},
+    {"id": "Task3", "name": "Task 3", "projectId": "Project1", "priority": 3, "startTime": null, "duration": 1.25},
+    {"id": "Task4", "name": "Task 4", "projectId": "Project1", "priority": 4, "startTime": null, "duration": 1},
+    {"id": "Task5", "name": "Task 5", "projectId": "Project1", "priority": 1, "startTime": null, "duration": 0.5},
+    {"id": "Task6", "name": "Task 6", "projectId": "Project1", "priority": 2, "startTime": null, "duration": 1.5},
+    {"id": "Task7", "name": "Task 7", "projectId": "Project1", "priority": 3, "startTime": null, "duration": 1.25},
+    {"id": "Task8", "name": "Task 8", "projectId": "Project1", "priority": 4, "startTime": null, "duration": 0.75},
+    {"id": "Task9", "name": "Task 9", "projectId": "Project1", "priority": 1, "startTime": null, "duration": 1},
+    {"id": "Task10", "name": "Task 10", "projectId": "Project1", "priority": 2, "startTime": null, "duration": 0.5},
+    {"id": "Task11", "name": "Task 11", "projectId": "Project1", "priority": 3, "startTime": null, "duration": 1.5},
+    {"id": "Task12", "name": "Task 12", "projectId": "Project1", "priority": 4, "startTime": null, "duration": 1.25},
+    {"id": "Task13", "name": "Task 13", "projectId": "Project1", "priority": 1, "startTime": null, "duration": 0.75},
+    {"id": "Task14", "name": "Task 14", "projectId": "Project1", "priority": 2, "startTime": null, "duration": 1},
+    {"id": "Task15", "name": "Task 15", "projectId": "Project1", "priority": 3, "startTime": null, "duration": 0.5},
+    {"id": "Task16", "name": "Task 16", "projectId": "Project1", "priority": 4, "startTime": null, "duration": 1.5},
+    {"id": "Task17", "name": "Task 17", "projectId": "Project1", "priority": 1, "startTime": null, "duration": 1.25},
+    {"id": "Task18", "name": "Task 18", "projectId": "Project1", "priority": 2, "startTime": null, "duration": 0.75},
+    {"id": "Task19", "name": "Task 19", "projectId": "Project1", "priority": 3, "startTime": null, "duration": 1},
+    {"id": "Task20", "name": "Task 20", "projectId": "Project1", "priority": 4, "startTime": null, "duration": 0.5}
+  ],
+  "projects": [
+    {"timeRangeStart": 1.0, "timeRangeEnd": 22.0, "id": "Project1", "name": "Project 1"}
+  ],
+  "bannedRanges": []
+}
