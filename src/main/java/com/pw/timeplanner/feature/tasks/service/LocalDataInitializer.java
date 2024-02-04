@@ -50,7 +50,7 @@ public class LocalDataInitializer {
                         .build();
                 return projectsRepository.save(newProject);
             });
-            if (!tasksRepository.findAllByUserIdAndStartDay(userId, now)
+            if (!tasksRepository.findAndLockAllByUserIdAndStartDay(userId, now)
                     .isEmpty()) {
                 return "";
             }

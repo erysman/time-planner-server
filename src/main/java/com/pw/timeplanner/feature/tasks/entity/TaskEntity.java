@@ -1,11 +1,13 @@
 package com.pw.timeplanner.feature.tasks.entity;
 
 import com.pw.timeplanner.core.entity.BaseEntity;
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
@@ -16,6 +18,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -27,7 +31,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "task")
+@Table(name = "task", indexes = {
+        @Index(name = "idxTaskUserIdStartDay", columnList = "userId, startDay"),
+        @Index(name = "idxTaskProjectId", columnList = "project_id")
+})
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class TaskEntity extends BaseEntity {
 
     @Column(nullable = false)

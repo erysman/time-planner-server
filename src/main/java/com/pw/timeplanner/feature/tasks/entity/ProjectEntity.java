@@ -1,6 +1,7 @@
 package com.pw.timeplanner.feature.tasks.entity;
 
 import com.pw.timeplanner.core.entity.BaseEntity;
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +15,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.LocalTime;
 import java.util.Set;
@@ -24,7 +27,9 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "project", uniqueConstraints = {@UniqueConstraint(name = "UniqueNameAndUserId",columnNames = { "name", "user_id" })})
+@Table(name = "project", uniqueConstraints = {@UniqueConstraint(name = "UniqueUserIdAndName",columnNames = { "userId", "name"})})
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ProjectEntity extends BaseEntity {
     public ProjectEntity(ProjectEntity entity) {
         this.name = entity.name;
@@ -46,7 +51,8 @@ public class ProjectEntity extends BaseEntity {
     private LocalTime scheduleStartTime;
     private LocalTime scheduleEndTime;
 
-    @OneToMany(mappedBy="project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @OrderBy("isImportant DESC, isUrgent DESC, name ASC")
+    @OneToMany(mappedBy="project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OrderBy("isImportant DESC, isUrgent DESC, name ASC" )
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<TaskEntity> tasks;
 }

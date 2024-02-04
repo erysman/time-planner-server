@@ -1,4 +1,4 @@
-package com.pw.timeplanner.client.model;
+package com.pw.timeplanner.scheduling_client.model;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;

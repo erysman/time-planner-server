@@ -12,6 +12,7 @@ import com.pw.timeplanner.feature.tasks.repository.ProjectsRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
@@ -24,7 +25,6 @@ import static com.pw.timeplanner.config.Constants.LOCAL_TIME_MAX;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class ProjectService {
 
     private final ProjectsRepository projectsRepository;
@@ -33,6 +33,7 @@ public class ProjectService {
     private final TasksProperties properties;
 
     public List<ProjectDTO> getProjects(String userId) {
+        log.info("Getting projects for user: {}", userId);
         return projectsRepository.findAllByUserId(userId)
                 .stream()
                 .map(mapper::toDTO)
@@ -40,6 +41,7 @@ public class ProjectService {
     }
 
     public Optional<ProjectDTO> getProject(String userId, UUID projectId) {
+        log.info("Getting project with id: {} for user: {}", projectId, userId);
         Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId);
         return projectEntity.map(mapper::toDTO);
     }
@@ -65,7 +67,9 @@ public class ProjectService {
         return mapper.toDTO(projectsRepository.save(defaultProject));
     }
 
+    @Transactional
     public void deleteProject(String userId, UUID projectId) {
+        log.info("Deleting project with id: {} for user: {}", projectId, userId);
         Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId);
         Optional<Boolean> existsAndIsDefaultProject = projectEntity.map(p -> p.getName()
                 .equals(properties.getDefaultProjectName()));
@@ -79,10 +83,11 @@ public class ProjectService {
             }
             projectEntity.ifPresent(projectsRepository::delete);
         });
-
     }
 
+    @Transactional
     public Optional<ProjectDTO> updateProject(String userId, UUID projectId, UpdateProjectDTO updateProjectDTO) {
+        log.info("Updating project with id: {} for user: {}", projectId, userId);
         Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId);
         if (projectEntity.isEmpty()) return Optional.empty();
         ProjectEntity project = projectEntity.get();
@@ -91,6 +96,7 @@ public class ProjectService {
     }
 
     public ProjectDTO createProject(String userId, CreateProjectDTO createProjectDTO) {
+        log.info("Creating project for user: {}", userId);
         ProjectEntity entity = mapper.createEntity(createProjectDTO);
         entity.setUserId(userId);
         if(entity.getScheduleStartTime() == null) {
@@ -99,10 +105,16 @@ public class ProjectService {
         if(entity.getScheduleEndTime() == null) {
             entity.setScheduleEndTime(LOCAL_TIME_MAX);
         }
-        return mapper.toDTO(projectsRepository.save(entity));
+        try {
+            return mapper.toDTO(projectsRepository.save(entity));
+        } catch (DataIntegrityViolationException e) {
+            log.error("Project with name: {} already exists for user: {}", createProjectDTO.getName(), userId);
+            throw new DataIntegrityViolationException("Project with name: " + createProjectDTO.getName() + " already exists for user: " + userId);
+        }
     }
 
     public List<TaskDTO> getProjectTasks(String userId, UUID projectId) {
+        log.info("Getting tasks for project with id: {} for user: {}", projectId, userId);
         Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId);
         return projectEntity.map(entity -> entity.getTasks()
                         .stream()

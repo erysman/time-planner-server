@@ -1,5 +1,6 @@
-package com.pw.timeplanner.client.model;
+package com.pw.timeplanner.scheduling_client.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 @Value
 @Builder
+@AllArgsConstructor
 public class ScheduledTask implements Serializable {
     UUID id;
 

@@ -22,7 +22,6 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 @Slf4j
-@Transactional
 public class TasksService {
 
     private final ProjectsRepository projectsRepository;
@@ -32,6 +31,7 @@ public class TasksService {
     private final TasksValidator tasksValidator;
     private final TasksProperties properties;
 
+    @Transactional
     public Optional<TaskDTO> createTask(String userId, CreateTaskDTO createTaskDTO) {
         tasksValidator.validate(createTaskDTO);
         ProjectEntity projectEntity = getProject(userId, createTaskDTO);
@@ -74,6 +74,7 @@ public class TasksService {
                 .map(mapper::toDTO);
     }
 
+    @Transactional
     public boolean deleteTask(String userId, UUID taskId) {
         Optional<TaskEntity> entity = tasksRepository.findOneByUserIdAndId(userId, taskId);
         if (entity.isEmpty()) {
@@ -84,9 +85,10 @@ public class TasksService {
         return true;
     }
 
+    @Transactional
     public Optional<TaskDTO> updateTask(String userId, UUID taskId, UpdateTaskDTO updateTaskDTO) {
         log.info("Updating task " + taskId + " with: " + updateTaskDTO);
-        Optional<TaskEntity> entity = tasksRepository.lockAndFindOneByUserIdAndId(userId, taskId);
+        Optional<TaskEntity> entity = tasksRepository.findAndLockOneByUserIdAndId(userId, taskId);
         if (entity.isEmpty()) {
             return Optional.empty();
         }
