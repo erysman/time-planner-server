@@ -32,7 +32,7 @@ public interface DayTasksResource {
                               @PathVariable("day") LocalDate day);
 
     @GetMapping("/order")
-    @Operation(summary = "Get tasks order", responses = {
+    @Operation(summary = "Get order of tasks on day's list", responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
@@ -40,7 +40,7 @@ public interface DayTasksResource {
                                 @PathVariable("day") LocalDate day);
 
     @PutMapping("/order")
-    @Operation(summary = "Update tasks order", responses = {
+    @Operation(summary = "Update tasks order on day's list", responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
             @ApiResponse(responseCode = "409", description = "Data conflict")
@@ -57,7 +57,7 @@ public interface DayTasksResource {
                                         @PathVariable("day") LocalDate day);
 
     @PostMapping("/schedule")
-    @Operation(summary = "Run automatically assign startTime to all tasks assigned to selected day", responses = {
+    @Operation(summary = "Automatically assign startTime to all tasks for selected day", responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
@@ -65,6 +65,10 @@ public interface DayTasksResource {
                                         @PathVariable("day") LocalDate day);
 
     @DeleteMapping("/schedule")
+    @Operation(summary = "Remove startTimes for tasks set in last automatic schedule", responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Unauthorized")
+    })
     void revokeSchedule(JwtAuthenticationToken authentication,
                         @PathVariable("day") LocalDate day);
 

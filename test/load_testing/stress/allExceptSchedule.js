@@ -4,7 +4,7 @@ import {
     createProject, createTask, deleteProject, getDayTasks, getProjects, getTasksDayOrder, loginUser, SLEEP_DURATION,
     swapTwoRandomElements,
     updateTasksDayOrder
-} from "./common.js";
+} from "../common.js";
 
 const VU = 25;
 

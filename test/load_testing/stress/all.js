@@ -2,21 +2,30 @@ import http from 'k6/http';
 import {check, group, sleep} from "k6";
 import {vu} from 'k6/execution';
 import {
-    BASE_URL,
     createProject, createTask, deleteProject, getDayTasks, getProjects, getTasksDayOrder, loginUser, SLEEP_DURATION,
     swapTwoRandomElements,
     updateTasksDayOrder
-} from "./common.js";
+} from "../common.js";
 
-const VU = 1;
+const VU = 25;
 
 export const options = {
     scenarios: {
-        test_name: {
-            executor: 'per-vu-iterations',
-            vus: VU,
-            iterations: 1,
-        }
+        contacts: {
+            executor: 'ramping-vus',
+            startVUs: 1,
+            stages: [
+                { duration: '30s', target: VU },
+                { duration: '50s', target: VU },
+                { duration: '10s', target: 0 },
+            ],
+            gracefulRampDown: '0s',
+        },
+        // test_name: {
+        //     executor: 'per-vu-iterations',
+        //     vus: VU,
+        //     iterations: 1,
+        // }
     }
 };
 
@@ -33,10 +42,8 @@ export function setup() {
 
 export default function (data) {
     const localData = data.users[vu.idInTest]
-    console.log('localData', localData)
+    // console.log('localData', localData)
     const iteration = vu.iterationInInstance;
-
-    // initUser(vu.idInTest);
 
     let projectId = null;
 

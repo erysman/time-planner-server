@@ -20,6 +20,8 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -67,6 +69,7 @@ public class TaskEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = {@JoinColumn(name = "project_id", nullable = false)}, foreignKey = @ForeignKey(value =
             ConstraintMode.NO_CONSTRAINT))
+//    @NotFound(action = NotFoundAction.IGNORE)
     private ProjectEntity project;
 
     public Priority getPriority() {

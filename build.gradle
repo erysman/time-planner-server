@@ -61,9 +61,14 @@ dependencies {
 	testImplementation 'org.testcontainers:junit-jupiter:1.18.3'
 	testImplementation platform("org.spockframework:spock-bom:2.3-groovy-4.0")
 	testImplementation "org.spockframework:spock-core"
+	testImplementation "org.spockframework:spock-spring"
 	testRuntimeOnly 'net.bytebuddy:byte-buddy:1.14.10'
 	testRuntimeOnly "org.objenesis:objenesis:3.3"
 	runtimeOnly 'com.mysql:mysql-connector-j'
+}
+
+bootRun {
+	jvmArgs(['-Xmx2048m', '-XX:TieredStopAtLevel=4'])
 }
 
 jib {

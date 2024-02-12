@@ -9,62 +9,60 @@ import com.pw.timeplanner.scheduling_client.SchedulingServerClient
 import com.pw.timeplanner.scheduling_client.model.ScheduleTasksResponse
 import com.pw.timeplanner.scheduling_client.model.ScheduledTask
 import spock.lang.Specification
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 
 import java.time.LocalDate
 
-import static org.mockito.BDDMockito.*
-
-@SpringBootTest
 class ScheduleServiceSpec extends Specification {
 
-    @Autowired
     ScheduleService scheduleService
+    TimeConverter timeConverter
+    def orderService = Mock(TasksOrderService)
+    def tasksRepository = Mock(TasksRepository)
+    def bannedRangesService = Mock(BannedRangesService)
+    def client = Mock(SchedulingServerClient)
+    def properties = Mock(TasksProperties)
 
-    @MockBean
-    TasksOrderService orderService
+    String userId = "testUser"
+    LocalDate day = LocalDate.now()
 
-    @MockBean
-    TasksRepository tasksRepository
-
-    @MockBean
-    BannedRangesService bannedRangesService
-
-    @MockBean
-    SchedulingServerClient client
-
-    @MockBean
-    TasksProperties properties
+    def setup() {
+        properties.getDefaultDurationMinutes() >> 60
+        timeConverter = new TimeConverter(properties)
+        scheduleService = new ScheduleService(orderService, tasksRepository, bannedRangesService, client, properties, timeConverter)
+    }
 
     def "schedule method schedules tasks correctly"() {
-        given: "A user ID, a day, and mock tasks"
-            String userId = "testUser"
-            LocalDate day = LocalDate.now()
-            List<ProjectEntity> projectEntities = [
-                    new ProjectEntity(id: UUID.randomUUID(), name: "Project 1")
-            ]
-            List<TaskEntity> mockTaskEntities = [
-                    new TaskEntity(id: UUID.randomUUID(), name: "Task 1", durationMin: 60, startTime: null, dayOrder: 0, userId: userId),
-            ]
-            List<ScheduledTask> scheduledTasks = [
-                    new ScheduledTask(id: mockTaskEntities[0].id, startTime: 9.0),
-            ]
-            ScheduleTasksResponse mockResponse = new ScheduleTasksResponse(scheduledTasks: scheduledTasks, runId: UUID.randomUUID())
-
-        and: "Mocking repository and client interactions"
-            mockTaskEntities.each { it.project = projectEntities[0] }
-            when(tasksRepository.findAndLockAllByUserIdAndStartDay(userId, day)).thenReturn(mockTaskEntities)
-            when(bannedRangesService.getBannedRanges(userId)).thenReturn([])
-            when(client.scheduleTasks(_, _, _)).thenReturn(mockResponse)
-            when(properties.getDefaultDurationMinutes()).thenReturn(60)
-
+        given: "tasks and projects"
+            def runId = UUID.randomUUID()
+            def project1 = buildProject("Project 1")
+            def task1 = buildTask(project1, "Task 1", 0)
+            def task2 = buildTask(project1, "Task 2", 1)
+            def scheduledTask1 = buildScheduledTask(task1.id, 9.0)
+        and: "mocking repository and client interactions"
+            tasksRepository.findAndLockAllByUserIdAndStartDayWithProjects(userId, day) >> [task1, task2]
+            bannedRangesService.getBannedRanges(userId) >> []
+            client.scheduleTasks(_, _, _) >> ScheduleTasksResponse.builder()
+                    .scheduledTasks([scheduledTask1]).runId(runId).build()
         when: "schedule method is called"
             scheduleService.schedule(userId, day)
+        then: "scheduled tasks are updated correctly"
+            1 * orderService.updateDayOrder(userId, day)
+            timeConverter.timeToNumber(task1.startTime) == scheduledTask1.startTime
+            task1.durationMin == 60
+            task1.autoScheduled == true
+            task1.scheduleRunId == runId
+            task2.startTime == null
+    }
 
-        then: "Scheduled tasks are updated correctly"
-            1 * tasksRepository.saveAll(_)
-            1 * orderService.updateDayOrder(_, _, _, _)
+    private ScheduledTask buildScheduledTask(UUID id, Double startTime) {
+        ScheduledTask.builder().id(id).startTime(startTime).build()
+    }
+
+    private ProjectEntity buildProject(String name) {
+        ProjectEntity.builder().id(UUID.randomUUID()).name(name).build()
+    }
+
+    private TaskEntity buildTask(ProjectEntity project1, String name, Integer dayOrder) {
+        TaskEntity.builder().id(UUID.randomUUID()).name(name).dayOrder(dayOrder).userId(userId).project(project1).build()
     }
 }

@@ -121,6 +121,51 @@ export function createTask(token, iteration, day, time, projectId, isImportant =
     check(request, {
         "OK": (r) => r.status === 200
     });
+    if (request.status !== 200) {
+        return null;
+    }
+    try {
+        const response = JSON.parse(request.body);
+        return response;
+    } catch (e) {
+        console.error("Error parsing JSON:", e);
+    }
+}
+
+export function updateTask(token, id, name, startDay, startTime, durationMin, isImportant, isUrgent, projectId) {
+
+        let url = BASE_URL + `/tasks/${id}`;
+        let body = {};
+        if(name) {
+            body.name = name;
+        }
+        if(startDay) {
+            body.startDay = startDay;
+        }
+        if(startTime) {
+            body.startTime = startTime;
+        }
+        if(durationMin) {
+            body.durationMin = durationMin;
+        }
+        if(isImportant) {
+            body.isImportant = isImportant;
+        }
+        if(isUrgent) {
+            body.isUrgent = isUrgent;
+        }
+        if(projectId) {
+            body.projectId = projectId;
+        }
+
+
+        let params = {headers: {"Content-Type": "application/json", "Accept": "*/*", "Authorization": `Bearer ${token}`}};
+        let request = http.patch(url, JSON.stringify(body), params);
+
+        check(request, {
+            "OK": (r) => r.status === 200
+        });
+
 }
 
 export function getDayTasks(token, day) {
@@ -178,7 +223,7 @@ export function swapTwoRandomElements(array) {
     return array;
 }
 
-export function initUser(id) {
+export function initUser(id, day) {
     const projectsNumber = 5;
     const tasksNumber = 5;
     const tasksToScheduleNumber = 1;
@@ -193,10 +238,10 @@ export function initUser(id) {
     for (let i = 0; i < projects.length; i++) {
         console.log(projects[i]);
         for (let j = 0; j < tasksNumber; j++) {
-            createTask(user.token, j, "2024-02-03", `0${j}:00`, projects[i].id, false, false);
+            createTask(user.token, j, day, `0${j}:00`, projects[i].id, false, false);
         }
         for (let j = 0; j < tasksToScheduleNumber; j++) {
-            createTask(user.token, j, "2024-02-03", null, projects[i].id, true, false);
+            createTask(user.token, j, day, null, projects[i].id, true, false);
         }
     }
     return user;
@@ -205,6 +250,270 @@ export function initUser(id) {
 export const BASE_URL = "http://localhost:8080";
 // Sleep duration between successive requests.
 // You might want to edit the value of this variable or remove calls to the sleep function on the script.
-export const SLEEP_DURATION = 0;
+export const SLEEP_DURATION = 1;
+
+export function userSimulationNoSchedule(localData, day, iteration) {
+    let projectId = null;
+    group("/projects", () => {
+        {
+            getProjects(localData.token)
+            sleep(SLEEP_DURATION);
+        }
+        {
+            let project = createProject(localData.token, Math.random()*10000);
+            projectId = project.id;
+            sleep(SLEEP_DURATION);
+        }
+        {
+            getProjects(localData.token)
+            sleep(SLEEP_DURATION);
+        }
+    });
+
+    group("/tasks", () => {
+        {
+            getDayTasks(localData.token, day);
+            sleep(SLEEP_DURATION);
+        }
+        {
+            const task = createTask(localData.token, iteration, day, "08:00", projectId, false, false);
+            sleep(SLEEP_DURATION);
+            updateTask(localData.token, task.id, "different");
+        }
+        {
+            getDayTasks(localData.token, day);
+            sleep(SLEEP_DURATION);
+        }
+        {
+            const task = createTask(localData.token, iteration, day, null, projectId, false, false);
+            sleep(SLEEP_DURATION);
+            updateTask(localData.token, task.id, null, null, "14:00");
+        }
+    });
+
+    group("/projects", () => {
+        {
+            deleteProject(localData.token, projectId);
+            sleep(SLEEP_DURATION);
+        }
+        {
+            getProjects(localData.token)
+            sleep(SLEEP_DURATION);
+        }
+        {
+            let project = createProject(localData.token, Math.random()*10000);
+            projectId = project.id;
+            sleep(SLEEP_DURATION);
+        }
+        {
+            getProjects(localData.token)
+            sleep(SLEEP_DURATION);
+        }
+        {
+            deleteProject(localData.token, projectId);
+            sleep(SLEEP_DURATION);
+        }
+    });
 
 
+    group("/day/{day}/tasks/order", () => {
+        getTasksDayOrder(localData.token, day);
+        sleep(SLEEP_DURATION);
+        const order = getTasksDayOrder(localData.token, day);
+        sleep(SLEEP_DURATION);
+        // order.sort(() => Math.random() - 0.5);
+        updateTasksDayOrder(localData.token, day, swapTwoRandomElements(order));
+
+    });
+
+    group("/tasks", () => {
+        {
+            getDayTasks(localData.token, day);
+            sleep(SLEEP_DURATION);
+        }
+    });
+
+    group("/day/{day}/tasks/order", () => {
+        getTasksDayOrder(localData.token, day);
+        sleep(SLEEP_DURATION);
+        const order = getTasksDayOrder(localData.token, day);
+        sleep(SLEEP_DURATION);
+        // order.sort(() => Math.random() - 0.5);
+        updateTasksDayOrder(localData.token, day, swapTwoRandomElements(order));
+
+    });
+    group("/tasks", () => {
+        {
+            getDayTasks(localData.token, day);
+            sleep(SLEEP_DURATION);
+        }
+    });
+
+    group("/day/{day}/tasks/order", () => {
+        const order = getTasksDayOrder(localData.token, day);
+        sleep(SLEEP_DURATION);
+    });
+}
+
+
+function schedule(day, localData) {
+    group("/day/{day}/tasks/schedule", () => {
+        // Request No. 1: getAutoScheduleInfo
+        {
+            let url = BASE_URL + `/day/${day}/tasks/schedule`;
+            let request = http.get(url, {headers: {"Authorization": `Bearer ${localData.token}`}});
+
+            check(request, {
+                "OK": (r) => r.status === 200
+            });
+
+            sleep(1);
+        }
+
+        // Request No. 2: postAutoScheduleInfo
+        {
+            let url = BASE_URL + `/day/${day}/tasks/schedule`;
+            let request = http.post(url, null, {headers: {"Authorization": `Bearer ${localData.token}`}});
+
+            check(request, {
+                "OK": (r) => r.status === 200
+            });
+
+            sleep(SLEEP_DURATION);
+        }
+        {
+            let url = BASE_URL + `/day/${day}/tasks/schedule`;
+            let request = http.del(url, null, {headers: {"Authorization": `Bearer ${localData.token}`}});
+
+            check(request, {
+                "OK": (r) => r.status === 200
+            });
+        }
+    });
+
+}
+
+export function userSimulationWithSchedule(localData, day, iteration) {
+    let projectId = null;
+
+    const scheduleMoment = Math.floor(Math.random()*5);
+
+    if(scheduleMoment === 0) {
+        schedule(day, localData);
+    }
+    group("/projects", () => {
+        {
+            getProjects(localData.token)
+            sleep(SLEEP_DURATION);
+        }
+        {
+            let project = createProject(localData.token, Math.random()*10000);
+            projectId = project.id;
+            sleep(SLEEP_DURATION);
+        }
+        {
+            getProjects(localData.token)
+            sleep(SLEEP_DURATION);
+        }
+    });
+
+    group("/tasks", () => {
+        {
+            getDayTasks(localData.token, day);
+            sleep(SLEEP_DURATION);
+        }
+        {
+            const task = createTask(localData.token, iteration, day, "08:00", projectId, false, false);
+            sleep(SLEEP_DURATION);
+            updateTask(localData.token, task.id, "different");
+        }
+    })
+    if(scheduleMoment === 1) {
+        schedule(day, localData);
+    }
+    group("/tasks", () => {
+        {
+            getDayTasks(localData.token, day);
+            sleep(SLEEP_DURATION);
+        }
+        {
+            const task = createTask(localData.token, iteration, day, null, projectId, false, false);
+            sleep(SLEEP_DURATION);
+            updateTask(localData.token, task.id, null, null, "14:00");
+        }
+    });
+
+    group("/projects", () => {
+        {
+            deleteProject(localData.token, projectId);
+            sleep(SLEEP_DURATION);
+        }
+        {
+            getProjects(localData.token)
+            sleep(SLEEP_DURATION);
+        }
+    });
+    if(scheduleMoment === 2) {
+        schedule(day, localData);
+    }
+    group("/projects", () => {
+        {
+            let project = createProject(localData.token, Math.random()*10000);
+            projectId = project.id;
+            sleep(SLEEP_DURATION);
+        }
+        {
+            getProjects(localData.token)
+            sleep(SLEEP_DURATION);
+        }
+        {
+            deleteProject(localData.token, projectId);
+            sleep(SLEEP_DURATION);
+        }
+    });
+
+
+    group("/day/{day}/tasks/order", () => {
+        getTasksDayOrder(localData.token, day);
+        sleep(SLEEP_DURATION);
+        const order = getTasksDayOrder(localData.token, day);
+        sleep(SLEEP_DURATION);
+        // order.sort(() => Math.random() - 0.5);
+        updateTasksDayOrder(localData.token, day, swapTwoRandomElements(order));
+
+    });
+    if(scheduleMoment === 3) {
+        schedule(day, localData);
+    }
+
+    group("/tasks", () => {
+        {
+            getDayTasks(localData.token, day);
+            sleep(SLEEP_DURATION);
+        }
+    });
+
+    group("/day/{day}/tasks/order", () => {
+        getTasksDayOrder(localData.token, day);
+        sleep(SLEEP_DURATION);
+        const order = getTasksDayOrder(localData.token, day);
+        sleep(SLEEP_DURATION);
+        // order.sort(() => Math.random() - 0.5);
+        updateTasksDayOrder(localData.token, day, swapTwoRandomElements(order));
+
+    });
+    group("/tasks", () => {
+        {
+            getDayTasks(localData.token, day);
+            sleep(SLEEP_DURATION);
+        }
+    });
+
+    group("/day/{day}/tasks/order", () => {
+        const order = getTasksDayOrder(localData.token, day);
+        sleep(SLEEP_DURATION);
+    });
+    if(scheduleMoment === 4) {
+        schedule(day, localData);
+    }
+}

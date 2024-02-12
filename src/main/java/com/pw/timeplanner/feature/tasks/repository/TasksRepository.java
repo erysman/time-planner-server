@@ -37,7 +37,7 @@ public interface TasksRepository extends JpaRepository<TaskEntity, UUID> {
     List<TaskEntity> findAndLockAllByUserIdAndStartDayWithProjects(@Param("userId") String userId, @Param("day") LocalDate day);
 
     @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
-    @Query("select t from TaskEntity t where t.userId = :userId and t.startDay = :startDay")
+//    @Query("select t from TaskEntity t where t.userId = :userId and t.startDay = :startDay")
     List<TaskEntity> findAllByUserIdAndStartDay(@Param("userId") String userId, @Param("startDay") LocalDate startDay);
 
     @Query("select t from TaskEntity t where t.userId = :userId and t.startDay = :startDay and t.dayOrder is not null order by t.dayOrder")
