@@ -83,51 +83,9 @@ public class ScheduleService {
                                 }
                             });
                 });
-
-//        scheduledTasks.forEach(scheduledTask -> {
-//            Optional<TaskEntity> entity = taskEntities.stream()
-//                    .filter(taskEntity -> taskEntity.getId()
-//                            .equals(scheduledTask.getId()))
-//                    .findFirst();
-//            entity.ifPresent(taskEntity -> {
-//                if (taskEntity.getStartTime() == null) {
-//                    taskEntity.setAutoScheduled(true);
-//                    taskEntity.setScheduleRunId(runId);
-//                    taskEntity.setDayOrder(null);
-//                    LocalTime newStartTime = numberToTime(scheduledTask.getStartTime());
-//                    taskEntity.setStartTime(newStartTime);
-//                }
-//                if (taskEntity.getDurationMin() == null) {
-//                    taskEntity.setDurationMin(properties.getDefaultDurationMinutes());
-//                }
-//            });
-//        });
         //update day order for all tasks in the day
         orderService.updateDayOrder(userId, day);
     }
-
-//    private void updateScheduledTasks(String userId, ScheduleTasksResponse scheduledTasksResponse, List<TaskEntity> taskEntities) {
-//        List<ScheduledTask> scheduledTasks = scheduledTasksResponse.getScheduledTasks();
-//        UUID runId = scheduledTasksResponse.getRunId();
-//        scheduledTasks.forEach(scheduledTask -> {
-//            Optional<TaskEntity> entity = taskEntities.stream()
-//                    .filter(taskEntity -> taskEntity.getId()
-//                            .equals(scheduledTask.getId()))
-//                    .findFirst();
-//            entity.ifPresent(taskEntity -> {
-//                if (taskEntity.getStartTime() == null) {
-//                    taskEntity.setAutoScheduled(true);
-//                    taskEntity.setScheduleRunId(runId);
-//                    LocalTime newStartTime = numberToTime(scheduledTask.getStartTime());
-//                    orderService.updateDayOrder(userId, taskEntity, null, JsonNullable.of(newStartTime));
-//                    taskEntity.setStartTime(newStartTime);
-//                }
-//                if (taskEntity.getDurationMin() == null) {
-//                    taskEntity.setDurationMin(properties.getDefaultDurationMinutes());
-//                }
-//            });
-//        });
-//    }
 
     private List<Task> prepareTasks(List<TaskEntity> taskEntities) {
         return taskEntities.stream()
@@ -135,7 +93,7 @@ public class ScheduleService {
                         .id(e.getId())
                         .name(e.getName())
                         .startTime(timeConverter.timeToNumber(e.getStartTime()))
-                        .duration(timeConverter.getDurationHours(e))
+                        .duration(getDurationHours(e))
                         .priority(e.getPriority()
                                 .getValue())
                         .projectId(e.getProject()
@@ -178,20 +136,11 @@ public class ScheduleService {
                     taskEntity.setScheduleRunId(null);
                 });
         //set day order for all tasks without start time in the day
-        orderService.setMissingDayOrder(taskEntities);
+        orderService.updateDayOrder(userId, day);
     }
 
-
-//    @Transactional
-//    public void revokeSchedule(String userId, LocalDate day) {
-//        log.info("Revoking schedule for user: " + userId + " and day: " + day);
-//        List<TaskEntity> taskEntities = tasksRepository.findAndLockAllByUserIdAndStartDay(userId, day);
-//        taskEntities.stream()
-//                .filter(TaskEntity::getAutoScheduled)
-//                .forEach(taskEntity -> {
-//                    orderService.updateDayOrder(userId, taskEntity, null, JsonNullable.of(null));
-//                    taskEntity.setStartTime(null);
-//                    taskEntity.setAutoScheduled(false);
-//                });
-//    }
+    private double getDurationHours(TaskEntity e) {
+        if (e.getDurationMin() != null) return e.getDurationMin() / 60.0;
+        return this.properties.getDefaultDurationMinutes() / 60.0;
+    }
 }

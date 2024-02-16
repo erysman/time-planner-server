@@ -6,7 +6,7 @@ import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
 import com.pw.timeplanner.feature.tasks.service.ScheduleService;
 import com.pw.timeplanner.feature.tasks.service.TasksOrderService;
 import com.pw.timeplanner.feature.tasks.service.TasksService;
-import com.pw.timeplanner.feature.tasks.service.exceptions.DataConflictException;
+import com.pw.timeplanner.feature.tasks.service.exceptions.OrderConflictException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -47,7 +47,7 @@ public class DayTasksController implements DayTasksResource {
         String userId = getUserIdFromToken(authentication);
         try {
             return tasksOrderService.reorderTasksForDay(userId, day, tasksOrder);
-        } catch (DataConflictException e) {
+        } catch (OrderConflictException e) {
             log.info(e.getMessage());
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }

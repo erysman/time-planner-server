@@ -93,7 +93,7 @@ public class TasksService {
             return Optional.empty();
         }
         TaskEntity task = entity.get();
-        tasksValidator.validateUpdate(updateTaskDTO, task);
+        tasksValidator.validate(updateTaskDTO);
         if (updateTaskDTO.getStartTime() != null || updateTaskDTO.getStartDay() != null) {
             tasksOrderService.updateDayOrder(userId, task, updateTaskDTO.getStartDay(), updateTaskDTO.getStartTime());
             task.setAutoScheduled(false);

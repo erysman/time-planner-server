@@ -1,8 +1,8 @@
 package com.pw.timeplanner.feature.tasks.service.exceptions;
 
-public class DataConflictException extends Exception {
+public class OrderConflictException extends Exception {
 
-    public DataConflictException(String message) {
+    public OrderConflictException(String message) {
         super(message);
     }
 }

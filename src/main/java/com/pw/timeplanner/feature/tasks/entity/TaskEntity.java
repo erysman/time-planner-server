@@ -17,11 +17,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -39,6 +38,7 @@ import java.util.UUID;
 })
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@ToString(callSuper = true, exclude = {"project"})
 public class TaskEntity extends BaseEntity {
 
     @Column(nullable = false)

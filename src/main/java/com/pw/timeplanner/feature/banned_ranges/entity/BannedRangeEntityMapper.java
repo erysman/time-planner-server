@@ -1,11 +1,12 @@
 package com.pw.timeplanner.feature.banned_ranges.entity;
 
+import com.pw.timeplanner.config.MapStructConfig;
 import com.pw.timeplanner.feature.banned_ranges.api.dto.BannedRangeDTO;
 import com.pw.timeplanner.feature.banned_ranges.api.dto.CreateBannedRangeDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = MapStructConfig.class)
 public interface BannedRangeEntityMapper {
 
     BannedRangeDTO toDTO(BannedRangeEntity entity);

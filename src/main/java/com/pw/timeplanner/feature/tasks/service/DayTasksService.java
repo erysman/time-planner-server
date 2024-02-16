@@ -1,15 +1,5 @@
 package com.pw.timeplanner.feature.tasks.service;
 
-import com.pw.timeplanner.feature.tasks.service.exceptions.DataConflictException;
-import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
-
 //@Service
 //@AllArgsConstructor
 //@Slf4j

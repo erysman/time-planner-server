@@ -1,7 +1,6 @@
 package com.pw.timeplanner.feature.tasks.service;
 
 import com.pw.timeplanner.config.TasksProperties;
-import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +28,5 @@ public class TimeConverter {
             return 24.0;
         }
         return timeToNumber(end);
-    }
-
-    public double getDurationHours(TaskEntity e) {
-        if (e.getDurationMin() != null) return e.getDurationMin() / 60.0;
-        return this.properties.getDefaultDurationMinutes() / 60.0;
     }
 }
