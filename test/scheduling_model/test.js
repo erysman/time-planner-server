@@ -9,6 +9,8 @@ export const options = {
     iterations: 1
 };
 
+const SCHEDULING_SERVER_URL = 'http://localhost:8082/v1/scheduleTasks';
+
 const validRate = new Rate('valid_responses');
 const totalScheduledTasks = new Trend(`total_scheduled_tasks_percent`);
 const scheduledTasks_t5 = new Trend(`scheduled_tasks_percent_t5`);
@@ -137,7 +139,7 @@ function areScheduledTasksValid(res, testCase) {
 
 function runTestCase(testCase) {
     const headers = {headers: {'Content-Type': 'application/json'}};
-    const res = http.post('http://localhost:8082/v1/scheduleTasks', testCase.payload, headers);
+    const res = http.post(SCHEDULING_SERVER_URL, testCase.payload, headers);
     // console.log(res.body);
     let {isResponseValid, score} = areScheduledTasksValid(res, testCase);
     validRate.add(isResponseValid);

@@ -2,11 +2,13 @@ import http from 'k6/http';
 import {check, group, sleep} from "k6";
 import {vu} from 'k6/execution';
 
-const API_KEY = "AIzaSyB6Y6MGv1hMvHY4Mdx6nFuhDAAGDF_Yo_U"
+const AUTH_API_KEY = "" //SET API KEY TO FIREBASE!
 const AUTH_BASE_URL = 'https://identitytoolkit.googleapis.com/v1/accounts';
-const key = `key=${API_KEY}`;
+const key = `key=${AUTH_API_KEY}`;
 const AUTH_HEADERS = {headers: {'Content-Type': 'application/json'}};
 const password = '123456';
+export const BASE_URL = "http://localhost:8080";
+export const SLEEP_DURATION = 1;
 
 export function createUser(id) {
     const email = `user${id}@email.com`;
@@ -247,10 +249,6 @@ export function initUser(id, day) {
     return user;
 }
 
-export const BASE_URL = "http://localhost:8080";
-// Sleep duration between successive requests.
-// You might want to edit the value of this variable or remove calls to the sleep function on the script.
-export const SLEEP_DURATION = 1;
 
 export function userSimulationNoSchedule(localData, day, iteration) {
     let projectId = null;
