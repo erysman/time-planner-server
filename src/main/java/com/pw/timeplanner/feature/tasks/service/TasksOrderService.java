@@ -2,7 +2,7 @@ package com.pw.timeplanner.feature.tasks.service;
 
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
 import com.pw.timeplanner.feature.tasks.repository.TasksRepository;
-import com.pw.timeplanner.feature.tasks.service.exceptions.OrderConflictException;
+import com.pw.timeplanner.feature.tasks.service.exceptions.ListOrderException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -34,7 +34,7 @@ public class TasksOrderService {
     }
 
     @Transactional
-    public List<UUID> reorderTasksForDay(String userId, LocalDate day, List<UUID> tasksOrder) throws OrderConflictException {
+    public List<UUID> reorderTasksForDay(String userId, LocalDate day, List<UUID> tasksOrder) {
         Set<TaskEntity> previousTaskOrder = tasksRepository.findAndLockTasksWithDayOrder(userId, day);
         Set<UUID> existingTasksIds = previousTaskOrder.stream()
                 .map(TaskEntity::getId)
@@ -45,14 +45,14 @@ public class TasksOrderService {
         boolean isNewOrderDistinct = newTasksOrderIds.size() == tasksOrder.size();
         if (!allPreviousTasksPresent) {
             existingTasksIds.removeAll(newTasksOrderIds);
-            throw new OrderConflictException("Missing task ids: " + existingTasksIds);
+            throw new ListOrderException("Missing task ids: " + existingTasksIds);
         }
         if (!allTasksExists) {
             newTasksOrderIds.removeAll(existingTasksIds);
-            throw new OrderConflictException("Missing task ids: " + newTasksOrderIds);
+            throw new ListOrderException("Non-existent task ids: " + newTasksOrderIds);
         }
         if (!isNewOrderDistinct) {
-            throw new OrderConflictException("New order is not distinct");
+            throw new ListOrderException("Tasks ids are not distinct");
         }
         tasksOrder.forEach(taskId -> {
             previousTaskOrder.stream()

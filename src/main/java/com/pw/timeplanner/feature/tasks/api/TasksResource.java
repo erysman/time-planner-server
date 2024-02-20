@@ -5,6 +5,7 @@ import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
 import com.pw.timeplanner.feature.tasks.api.dto.UpdateTaskDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 //@Validated
@@ -36,7 +36,7 @@ public interface TasksResource {
                            @RequestParam("day") LocalDate day);
 
     @GetMapping("/{id}")
-    Optional<TaskDTO> getTask(JwtAuthenticationToken authentication,
+    TaskDTO getTask(JwtAuthenticationToken authentication,
                               @PathVariable("id") UUID id);
 
     @DeleteMapping("/{id}")
@@ -44,12 +44,12 @@ public interface TasksResource {
                               @PathVariable("id") UUID id);
 
     @PatchMapping("/{id}")
-    Optional<TaskDTO> updateTask(JwtAuthenticationToken authentication,
+    TaskDTO updateTask(JwtAuthenticationToken authentication,
                        @PathVariable("id") UUID id,
                        @RequestBody @Validated UpdateTaskDTO updateTaskDTO);
 
     @PostMapping
-    Optional<TaskDTO> createTask(JwtAuthenticationToken authentication,
-                                 @RequestBody @Validated CreateTaskDTO createTaskDTO);
+    TaskDTO createTask(JwtAuthenticationToken authentication,
+                                 @RequestBody @Valid CreateTaskDTO createTaskDTO);
 
 }

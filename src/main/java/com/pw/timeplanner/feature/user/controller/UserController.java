@@ -20,7 +20,7 @@ public class UserController implements UserResource {
     @Override
     public UserInfoDTO getUserInfo(JwtAuthenticationToken authentication) {
         String userId = getUserIdFromToken(authentication);
-        return service.getUserInfo(userId, authentication);
+        return service.getUserInfo(userId);
     }
 
     @Override

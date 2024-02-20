@@ -2,7 +2,7 @@ package com.pw.timeplanner.feature.tasks.service
 
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity
 import com.pw.timeplanner.feature.tasks.repository.TasksRepository
-import com.pw.timeplanner.feature.tasks.service.exceptions.OrderConflictException
+import com.pw.timeplanner.feature.tasks.service.exceptions.ListOrderException
 import org.openapitools.jackson.nullable.JsonNullable
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -45,7 +45,7 @@ class TasksOrderServiceTest extends Specification {
             service.reorderTasksForDay(userId, day, newOrder)
         then:
             1 * tasksRepository.findAndLockTasksWithDayOrder(userId, day) >> tasks
-            thrown(OrderConflictException)
+            thrown(ListOrderException)
         where:
             taskIds                                                   | newOrder
             [UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()] | [taskIds[2], taskIds[1], taskIds[0], UUID.randomUUID()]

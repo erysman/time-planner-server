@@ -46,10 +46,13 @@ dependencies {
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	implementation 'org.zalando:logbook-spring-boot-starter:3.2.0'
 	implementation 'org.zalando:logbook-json:3.2.0'
+	implementation 'org.zalando:problem-spring-web-starter:0.29.1'
 	implementation 'net.ttddyy:datasource-proxy:1.9'
 	implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
 	implementation platform('org.apache.groovy:groovy-bom:4.0.16')
 	implementation 'org.apache.groovy:groovy'
+	implementation 'org.apache.commons:commons-lang3:3.14.0'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'

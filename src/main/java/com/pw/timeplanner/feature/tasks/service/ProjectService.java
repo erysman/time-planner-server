@@ -1,6 +1,9 @@
 package com.pw.timeplanner.feature.tasks.service;
 
 import com.pw.timeplanner.config.TasksProperties;
+import com.pw.timeplanner.core.exception.ResourceAlreadyExistsException;
+import com.pw.timeplanner.core.exception.ResourceNotFoundException;
+import com.pw.timeplanner.feature.tasks.api.ProjectsResource;
 import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
 import com.pw.timeplanner.feature.tasks.api.projectDto.CreateProjectDTO;
 import com.pw.timeplanner.feature.tasks.api.projectDto.ProjectDTO;
@@ -40,23 +43,26 @@ public class ProjectService {
                 .toList();
     }
 
-    public Optional<ProjectDTO> getProject(String userId, UUID projectId) {
+    public ProjectDTO getProject(String userId, UUID projectId) {
+        return mapper.toDTO(getProjectEntity(userId, projectId));
+    }
+
+    public ProjectEntity getProjectEntity(String userId, UUID projectId) {
         log.info("Getting project with id: {} for user: {}", projectId, userId);
-        Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId);
-        return projectEntity.map(mapper::toDTO);
+        return projectsRepository.findOneByUserIdAndId(userId, projectId)
+                .orElseThrow( () -> new ResourceNotFoundException(ProjectsResource.RESOURCE_PATH, projectId));
     }
 
-    public Optional<ProjectDTO> getDefaultProject(String userId) {
-        Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndName(userId,
-                properties.getDefaultProjectName());
-        return projectEntity.map(mapper::toDTO);
+    public ProjectDTO getOrCreateDefaultProject(String userId) {
+        return mapper.toDTO(getOrCreateDefaultProjectEntity(userId));
     }
 
-    public ProjectDTO createDefaultProject(String userId) {
-        Optional<ProjectDTO> existingDefaultProject = this.getDefaultProject(userId);
-        if (existingDefaultProject.isPresent()) {
-            return existingDefaultProject.get();
-        }
+    public ProjectEntity getOrCreateDefaultProjectEntity(String userId) {
+        return projectsRepository.findOneByUserIdAndName(userId,
+                properties.getDefaultProjectName()).or(() -> Optional.of(createDefaultProject(userId))).orElseThrow();
+    }
+
+    private ProjectEntity createDefaultProject(String userId) {
         ProjectEntity defaultProject = ProjectEntity.builder()
                 .name(properties.getDefaultProjectName())
                 .userId(userId)
@@ -64,35 +70,35 @@ public class ProjectService {
                 .scheduleStartTime(LocalTime.MIN)
                 .scheduleEndTime(LOCAL_TIME_MAX)
                 .build();
-        return mapper.toDTO(projectsRepository.save(defaultProject));
+        log.info("Creating default project named '{}' for user: {}", properties.getDefaultProjectName(), userId);
+        return projectsRepository.save(defaultProject);
     }
 
     @Transactional
     public void deleteProject(String userId, UUID projectId) {
         log.info("Deleting project with id: {} for user: {}", projectId, userId);
-        Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId);
-        Optional<Boolean> existsAndIsDefaultProject = projectEntity.map(p -> p.getName()
-                .equals(properties.getDefaultProjectName()));
-        existsAndIsDefaultProject.ifPresent(isDefaultProject -> {
-            if (isDefaultProject) {
-                ProjectEntity copy = new ProjectEntity(projectEntity.get());
-                projectEntity.ifPresent(projectsRepository::delete);
-                projectsRepository.flush();
-                projectsRepository.save(copy);
-                return;
-            }
-            projectEntity.ifPresent(projectsRepository::delete);
-        });
+        ProjectEntity projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId)
+                .orElseThrow( () -> new ResourceNotFoundException(ProjectsResource.RESOURCE_PATH, projectId));
+        boolean existsAndIsDefaultProject = projectEntity.getName()
+                .equals(properties.getDefaultProjectName());
+        if (existsAndIsDefaultProject) {
+            ProjectEntity copy = new ProjectEntity(projectEntity);
+            projectsRepository.delete(projectEntity);
+            projectsRepository.flush();
+            projectsRepository.save(copy);
+            return;
+        }
+        projectsRepository.delete(projectEntity);
+
     }
 
     @Transactional
-    public Optional<ProjectDTO> updateProject(String userId, UUID projectId, UpdateProjectDTO updateProjectDTO) {
+    public ProjectDTO updateProject(String userId, UUID projectId, UpdateProjectDTO updateProjectDTO) {
         log.info("Updating project with id: {} for user: {}", projectId, userId);
-        Optional<ProjectEntity> projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId);
-        if (projectEntity.isEmpty()) return Optional.empty();
-        ProjectEntity project = projectEntity.get();
-        mapper.update(updateProjectDTO, project);
-        return Optional.of(mapper.toDTO(project));
+        ProjectEntity projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId)
+                .orElseThrow( () -> new ResourceNotFoundException(ProjectsResource.RESOURCE_PATH, projectId));
+        mapper.update(updateProjectDTO, projectEntity);
+        return mapper.toDTO(projectEntity);
     }
 
     public ProjectDTO createProject(String userId, CreateProjectDTO createProjectDTO) {
@@ -108,8 +114,8 @@ public class ProjectService {
         try {
             return mapper.toDTO(projectsRepository.save(entity));
         } catch (DataIntegrityViolationException e) {
-            log.error("Project with name: {} already exists for user: {}", createProjectDTO.getName(), userId);
-            throw new DataIntegrityViolationException("Project with name: " + createProjectDTO.getName() + " already exists for user: " + userId);
+            log.info("Project with name: {} already exists for user: {}", createProjectDTO.getName(), userId);
+            throw new ResourceAlreadyExistsException(ProjectsResource.RESOURCE_PATH, "name", createProjectDTO.getName());
         }
     }
 

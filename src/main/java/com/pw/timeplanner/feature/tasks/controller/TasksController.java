@@ -8,14 +8,11 @@ import com.pw.timeplanner.feature.tasks.service.TasksService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.pw.timeplanner.core.AuthUtils.getUserIdFromToken;
@@ -34,7 +31,7 @@ public class TasksController implements TasksResource {
     }
 
     @Override
-    public Optional<TaskDTO> getTask(JwtAuthenticationToken authentication, UUID taskId) {
+    public TaskDTO getTask(JwtAuthenticationToken authentication, UUID taskId) {
         String userId = getUserIdFromToken(authentication);
         return tasksService.getTask(userId, taskId);
     }
@@ -42,19 +39,17 @@ public class TasksController implements TasksResource {
     @Override
     public void deleteTask(JwtAuthenticationToken authentication, UUID id) {
         String userId = getUserIdFromToken(authentication);
-        if(!tasksService.deleteTask(userId, id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+        tasksService.deleteTask(userId, id);
     }
 
     @Override
-    public Optional<TaskDTO> updateTask(JwtAuthenticationToken authentication, UUID id, UpdateTaskDTO updateTaskDTO) {
+    public TaskDTO updateTask(JwtAuthenticationToken authentication, UUID id, UpdateTaskDTO updateTaskDTO) {
         String userId = getUserIdFromToken(authentication);
         return tasksService.updateTask(userId, id, updateTaskDTO);
     }
 
     @Override
-    public Optional<TaskDTO> createTask(JwtAuthenticationToken authentication, CreateTaskDTO createTaskDTO) {
+    public TaskDTO createTask(JwtAuthenticationToken authentication, CreateTaskDTO createTaskDTO) {
         String userId = getUserIdFromToken(authentication);
         return tasksService.createTask(userId, createTaskDTO);
     }

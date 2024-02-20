@@ -12,7 +12,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.pw.timeplanner.core.AuthUtils.getUserIdFromToken;
@@ -37,7 +36,7 @@ public class ProjectController implements ProjectsResource {
     }
 
     @Override
-    public Optional<ProjectDTO> getProject(JwtAuthenticationToken authentication, UUID id) {
+    public ProjectDTO getProject(JwtAuthenticationToken authentication, UUID id) {
         String userId = getUserIdFromToken(authentication);
         return projectService.getProject(userId, id);
     }
@@ -49,7 +48,7 @@ public class ProjectController implements ProjectsResource {
     }
 
     @Override
-    public Optional<ProjectDTO> updateProject(JwtAuthenticationToken authentication, UUID id, UpdateProjectDTO updateProjectDTO) {
+    public ProjectDTO updateProject(JwtAuthenticationToken authentication, UUID id, UpdateProjectDTO updateProjectDTO) {
         String userId = getUserIdFromToken(authentication);
         return projectService.updateProject(userId, id, updateProjectDTO);
     }

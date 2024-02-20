@@ -6,14 +6,11 @@ import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
 import com.pw.timeplanner.feature.tasks.service.ScheduleService;
 import com.pw.timeplanner.feature.tasks.service.TasksOrderService;
 import com.pw.timeplanner.feature.tasks.service.TasksService;
-import com.pw.timeplanner.feature.tasks.service.exceptions.OrderConflictException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -45,12 +42,8 @@ public class DayTasksController implements DayTasksResource {
     @Override
     public List<UUID> updateTasksDayOrder(JwtAuthenticationToken authentication, LocalDate day, List<UUID> tasksOrder) {
         String userId = getUserIdFromToken(authentication);
-        try {
-            return tasksOrderService.reorderTasksForDay(userId, day, tasksOrder);
-        } catch (OrderConflictException e) {
-            log.info(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        }
+        return tasksOrderService.reorderTasksForDay(userId, day, tasksOrder);
+
     }
 
     @Override

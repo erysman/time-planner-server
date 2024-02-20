@@ -6,18 +6,6 @@ features:
     default-project-name: inbox
     default-project-color: "#1632e5"
 
-#com:
-#  pw:
-#    timeplanner:
-#      core:
-#        validation:
-#          NullOrNotBlank:
-#            message:
-#      feature:
-#        tasks:
-#          validation:
-#            NullOrGreaterThanMinimumDuration:
-#              message:
 server:
 #  address: 0.0.0.0
   port: ${PORT:8080}
@@ -50,7 +38,7 @@ spring:
           batch_versioned_data: true
 #        format_sql: true
         #optional - generate statistics to check if L2/query cache is actually being used.
-        generate_statistics: true
+#        generate_statistics: true
         cache:
 #          missing_cache_strategy: create
           #required - turn on L2 cache.
