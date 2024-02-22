@@ -19,6 +19,8 @@ public interface UserResource {
     UserInfoDTO getUserInfo(JwtAuthenticationToken authentication);
 
     @PostMapping("/initialize")
+    @Operation(summary = "Initialize default data for a new user", responses = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Unauthorized")})
     UserInfoDTO initializeUser(JwtAuthenticationToken authentication);
 
 }

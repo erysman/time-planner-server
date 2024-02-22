@@ -1,0 +1,93 @@
+{
+  "tasks": [
+    {
+      "id": "Z1",
+      "name": "Define project scope",
+      "projectId": "Z",
+      "priority": 1,
+      "startTime": null,
+      "duration": 1
+    },
+    {
+      "id": "Z2",
+      "name": "Gather requirements",
+      "projectId": "Z",
+      "priority": 2,
+      "startTime": null,
+      "duration": 2
+    },
+    {
+      "id": "Z3",
+      "name": "Create project plan",
+      "projectId": "Z",
+      "priority": 3,
+      "startTime": null,
+      "duration": 2
+    },
+    {
+      "id": "Z4",
+      "name": "Develop prototypes",
+      "projectId": "Z",
+      "priority": 1,
+      "startTime": null,
+      "duration": 1
+    },
+    {
+      "id": "Z5",
+      "name": "Design system architecture",
+      "projectId": "Z",
+      "priority": 4,
+      "startTime": null,
+      "duration": 4
+    },
+    {
+      "id": "Z6",
+      "name": "Implement features",
+      "projectId": "Z",
+      "priority": 4,
+      "startTime": null,
+      "duration": 3
+    },
+    {
+      "id": "Z7",
+      "name": "Conduct testing",
+      "projectId": "Z",
+      "priority": 2,
+      "startTime": null,
+      "duration": 2
+    },
+    {
+      "id": "Z8",
+      "name": "Fix bugs",
+      "projectId": "Z",
+      "priority": 4,
+      "startTime": null,
+      "duration": 2
+    },
+    {
+      "id": "Z9",
+      "name": "Deploy system",
+      "projectId": "Z",
+      "priority": 3,
+      "startTime": null,
+      "duration": 2
+    },
+    {
+      "id": "Z10",
+      "name": "Post-deployment review",
+      "projectId": "Z",
+      "priority": 1,
+      "startTime": null,
+      "duration": 1
+    }
+  ],
+  "projects": [
+    {
+      "timeRangeStart": 1.0,
+      "timeRangeEnd": 23.0,
+      "id": "Z",
+      "name": "Project Z"
+    }
+  ],
+  "bannedRanges": []
+}

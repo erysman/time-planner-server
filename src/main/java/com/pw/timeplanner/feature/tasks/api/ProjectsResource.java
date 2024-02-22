@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 //@Validated
@@ -32,7 +31,7 @@ public interface ProjectsResource {
     List<ProjectDTO> getProjects(JwtAuthenticationToken authentication);
 
     @GetMapping("/{id}")
-    Optional<ProjectDTO> getProject(JwtAuthenticationToken authentication, @PathVariable("id") UUID id);
+    ProjectDTO getProject(JwtAuthenticationToken authentication, @PathVariable("id") UUID id);
 
     @GetMapping("/{id}/tasks")
     @Operation(summary = "Get project tasks", responses = {@ApiResponse(responseCode = "200", description = "OK"),
@@ -43,7 +42,7 @@ public interface ProjectsResource {
     void deleteProject(JwtAuthenticationToken authentication, @PathVariable("id") UUID id);
 
     @PatchMapping("/{id}")
-    Optional<ProjectDTO> updateProject(JwtAuthenticationToken authentication, @PathVariable("id") UUID id,
+    ProjectDTO updateProject(JwtAuthenticationToken authentication, @PathVariable("id") UUID id,
                                        @RequestBody @Validated UpdateProjectDTO updateProjectDTO);
 
     @PostMapping

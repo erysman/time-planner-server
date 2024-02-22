@@ -1,0 +1,64 @@
+{
+  "tasks": [
+    {
+      "id": "A1",
+      "name": "Review code",
+      "projectId": "A",
+      "priority": 3,
+      "startTime": null,
+      "duration": 1
+    },
+    {
+      "id": "A2",
+      "name": "Write documentation",
+      "projectId": "A",
+      "priority": 2,
+      "startTime": null,
+      "duration": 1
+    },
+    {
+      "id": "A3",
+      "name": "Implement new feature",
+      "projectId": "A",
+      "priority": 4,
+      "startTime": null,
+      "duration": 1
+    },
+    {
+      "id": "A4",
+      "name": "Fix bugs",
+      "projectId": "A",
+      "priority": 1,
+      "startTime": null,
+      "duration": 2
+    },
+    {
+      "id": "A5",
+      "name": "Optimize performance",
+      "projectId": "A",
+      "priority": 3,
+      "startTime": null,
+      "duration": 2
+    }
+  ],
+  "projects": [
+    {
+      "timeRangeStart": 0.0,
+      "timeRangeEnd": 24.0,
+      "id": "A",
+      "name": "development"
+    }
+  ],
+  "bannedRanges": [
+    {
+      "timeRangeStart": 0.0,
+      "timeRangeEnd": 8.0,
+      "id": "R1"
+    },
+    {
+      "timeRangeStart": 22.0,
+      "timeRangeEnd": 24.0,
+      "id": "R2"
+    }
+  ]
+}

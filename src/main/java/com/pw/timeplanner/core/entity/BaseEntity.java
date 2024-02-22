@@ -15,6 +15,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -45,5 +46,22 @@ public abstract class BaseEntity implements Serializable {
     @PreUpdate
     public void updateDate(){
         this.lastModifiedDate = Instant.now();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        BaseEntity other = (BaseEntity) obj;
+        return Objects.equals(id, other.getId());
     }
 }

@@ -1,5 +1,6 @@
 package com.pw.timeplanner.feature.tasks.entity;
 
+import com.pw.timeplanner.config.MapStructConfig;
 import com.pw.timeplanner.core.entity.JsonNullableMapper;
 import com.pw.timeplanner.feature.tasks.api.projectDto.CreateProjectDTO;
 import com.pw.timeplanner.feature.tasks.api.projectDto.ProjectDTO;
@@ -8,9 +9,8 @@ import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(uses = JsonNullableMapper.class,nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,componentModel = "spring")
+@Mapper(config = MapStructConfig.class, uses = JsonNullableMapper.class)
 public interface ProjectEntityMapper {
 
     ProjectDTO toDTO(ProjectEntity entity);
