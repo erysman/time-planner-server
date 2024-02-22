@@ -12,6 +12,7 @@ import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.ProjectEntityMapper;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntityMapper;
 import com.pw.timeplanner.feature.tasks.repository.ProjectsRepository;
+import com.pw.timeplanner.feature.tasks.service.validator.ProjectsValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class ProjectService {
     private final ProjectEntityMapper mapper;
     private final TaskEntityMapper taskMapper;
     private final TasksProperties properties;
+    private final ProjectsValidator projectsValidator;
 
     public List<ProjectDTO> getProjects(String userId) {
         log.info("Getting projects for user: {}", userId);
@@ -97,12 +99,14 @@ public class ProjectService {
         log.info("Updating project with id: {} for user: {}", projectId, userId);
         ProjectEntity projectEntity = projectsRepository.findOneByUserIdAndId(userId, projectId)
                 .orElseThrow( () -> new ResourceNotFoundException(ProjectsResource.RESOURCE_PATH, projectId));
+        projectsValidator.validate(updateProjectDTO, projectEntity);
         mapper.update(updateProjectDTO, projectEntity);
         return mapper.toDTO(projectEntity);
     }
 
     public ProjectDTO createProject(String userId, CreateProjectDTO createProjectDTO) {
         log.info("Creating project for user: {}", userId);
+        projectsValidator.validate(createProjectDTO);
         ProjectEntity entity = mapper.createEntity(createProjectDTO);
         entity.setUserId(userId);
         if(entity.getScheduleStartTime() == null) {

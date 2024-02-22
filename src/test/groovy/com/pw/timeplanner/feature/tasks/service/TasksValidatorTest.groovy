@@ -4,6 +4,7 @@ import com.pw.timeplanner.config.TasksProperties
 import com.pw.timeplanner.feature.tasks.api.dto.CreateTaskDTO
 import com.pw.timeplanner.feature.tasks.api.dto.UpdateTaskDTO
 import com.pw.timeplanner.feature.tasks.service.exceptions.TimeGranularityException
+import com.pw.timeplanner.feature.tasks.service.validator.TasksValidator
 import org.openapitools.jackson.nullable.JsonNullable
 import spock.lang.Specification
 

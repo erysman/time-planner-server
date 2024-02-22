@@ -52,18 +52,26 @@ public class TasksOrderService {
             throw new ListOrderException("Non-existent task ids: " + newTasksOrderIds);
         }
         if (!isNewOrderDistinct) {
-            throw new ListOrderException("Tasks ids are not distinct");
+            throw new ListOrderException("Tasks ids are not distinct: " + getDuplicateIds(tasksOrder));
         }
-        tasksOrder.forEach(taskId -> {
-            previousTaskOrder.stream()
-                    .filter(task -> task.getId()
-                            .equals(taskId))
-                    .forEach(task -> task.setDayOrder(tasksOrder.indexOf(taskId)));
-        });
+        tasksOrder.forEach(taskId -> previousTaskOrder.stream()
+                .filter(task -> task.getId().equals(taskId))
+                .forEach(task -> task.setDayOrder(tasksOrder.indexOf(taskId)))
+        );
         return previousTaskOrder.stream()
                 .sorted(Comparator.comparing(TaskEntity::getDayOrder))
                 .map(TaskEntity::getId)
                 .collect(Collectors.toList());
+    }
+
+    private static Set<String> getDuplicateIds(List<UUID> newTasksOrderIds) {
+        Set<String> collected = newTasksOrderIds.stream()
+                .filter(id -> newTasksOrderIds.stream()
+                        .filter(id::equals)
+                        .count() > 1)
+                .map(UUID::toString)
+                .collect(Collectors.toSet());
+        return collected;
     }
 
     @Transactional
@@ -129,9 +137,7 @@ public class TasksOrderService {
 
         taskEntities.stream()
                 .filter(taskEntity -> taskEntity.getStartTime() == null && taskEntity.getDayOrder() == null)
-                .forEach(taskEntity -> {
-                    taskEntity.setDayOrder(dayOrderCounter.incrementAndGet());
-                });
+                .forEach(taskEntity -> taskEntity.setDayOrder(dayOrderCounter.incrementAndGet()));
     }
 
 
@@ -174,8 +180,9 @@ public class TasksOrderService {
         return presentAndNull(updateStartDay) || presentAndNotNull(updateStartTime);
     }
 
-    private static boolean shouldSetDayOrderToCurrentStartDay(JsonNullable<LocalDate> updateStartDay
-            , JsonNullable<LocalTime> updateStartTime, LocalDate startDay) {
+    private static boolean shouldSetDayOrderToCurrentStartDay(JsonNullable<LocalDate> updateStartDay,
+                                                              JsonNullable<LocalTime> updateStartTime,
+                                                              LocalDate startDay) {
         return startDay != null && startDayNotChanged(updateStartDay, startDay) && presentAndNull(updateStartTime);
     }
 
@@ -183,11 +190,10 @@ public class TasksOrderService {
         return updateStartDay == null || startDay.equals(updateStartDay.get());
     }
 
-    private static boolean shouldSetDayOrderToUpdatedStartDay(JsonNullable<LocalDate> updateStartDay
-            , JsonNullable<LocalTime> updateStartTime, LocalTime startTime) {
-        return presentAndNotNull(updateStartDay)
-                && (startTimeIsAlreadyNull(updateStartTime, startTime)
-                || startTimeIsUpdatedToNull(updateStartTime, startTime));
+    private static boolean shouldSetDayOrderToUpdatedStartDay(JsonNullable<LocalDate> updateStartDay,
+                                                              JsonNullable<LocalTime> updateStartTime,
+                                                              LocalTime startTime) {
+        return presentAndNotNull(updateStartDay) && (startTimeIsAlreadyNull(updateStartTime, startTime) || startTimeIsUpdatedToNull(updateStartTime, startTime));
     }
 
     private static boolean startTimeIsUpdatedToNull(JsonNullable<LocalTime> updateStartTime, LocalTime startTime) {

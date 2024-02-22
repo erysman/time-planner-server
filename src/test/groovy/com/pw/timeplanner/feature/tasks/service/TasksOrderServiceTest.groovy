@@ -35,7 +35,7 @@ class TasksOrderServiceTest extends Specification {
             returnedOrder == newOrder
     }
 
-    def "should throw OrderConflictException when given order contains wrong ids"() {
+    def "should throw ListOrderException when given order contains wrong ids"() {
         given:
             def task0 = TaskEntity.builder().id(taskIds[0]).dayOrder(0).build()
             def task1 = TaskEntity.builder().id(taskIds[1]).dayOrder(1).build()

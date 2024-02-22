@@ -2,6 +2,9 @@ package integration
 
 import com.pw.timeplanner.TimePlannerApplication
 import com.pw.timeplanner.config.MySQLInitializer
+import com.pw.timeplanner.config.TasksProperties
+import com.pw.timeplanner.feature.tasks.entity.ProjectEntity
+import com.pw.timeplanner.feature.tasks.repository.ProjectsRepository
 import com.pw.timeplanner.feature.user.api.UserResource
 import org.spockframework.spring.EnableSharedInjection
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,10 +32,23 @@ abstract class UserInitializedSpecification extends Specification {
     @Autowired
     @Shared MockMvc mockMvc
 
+    @Autowired
+    @Shared private ProjectsRepository projectsRepository
+
+    @Autowired
+    @Shared TasksProperties tasksProperties
+
+    @Shared ProjectEntity defaultProject
+
     def setupSpec() {
         def response = mockMvc.perform(post(UserResource.RESOURCE_PATH + "/initialize")
                 .with(jwt().jwt {it.claim("user_id", USER_ID)}))
         assert response.andExpect(status().isOk())
+        defaultProject = projectsRepository.findOneByUserIdAndName(USER_ID, tasksProperties.getDefaultProjectName()).orElseThrow()
+    }
+
+    def cleanupSpec() {
+        projectsRepository.deleteAll()
     }
 
     def userIdJwt() {

@@ -1,4 +1,4 @@
-package com.pw.timeplanner.feature.tasks.service;
+package com.pw.timeplanner.feature.tasks.service.validator;
 
 import com.pw.timeplanner.config.TasksProperties;
 import com.pw.timeplanner.feature.tasks.api.dto.CreateTaskDTO;

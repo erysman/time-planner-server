@@ -22,7 +22,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateTaskDTO implements Serializable {
-
     @NotBlank
     @Size(min = 1, max = 150)
     String name;

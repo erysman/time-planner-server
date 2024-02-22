@@ -84,7 +84,7 @@ class TasksControllerTest extends UserInitializedSpecification {
             "name" | null      | null     | "${UUID.randomUUID()}" | 404    | "projectId" | "Resource /projects with id ${projectId} not found"
     }
 
-    def "should return constraint validation error when trying to create task with invalid data"() {
+    def "should return 400 when trying to create task with invalid data"() {
         given:
             def json = buildCreateTaskBody(name, startTime, startDay, projectId, durationMin)
         when:
@@ -93,20 +93,20 @@ class TasksControllerTest extends UserInitializedSpecification {
                     .content(json)
                     .with(userIdJwt()))
         then:
-            response.andExpect(status().is(status))
+            response.andExpect(status().isBadRequest())
                     .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
                     .andExpect(jsonPath("\$.violations[?(@.field == '${field}')].message", hasItem(violation)))
             tasksRepository.findAll().size() == 0
         where:
-            name             | startTime | startDay  | durationMin | projectId | status | field         | violation
-            null             | null      | null      | null        | null      | 400    | "name"        | "must not be blank"
-            ""               | null      | null      | null        | null      | 400    | "name"        | "must not be blank"
-            "${random(160)}" | null      | null      | null        | null      | 400    | "name"        | "size must be between 1 and 150"
-            "name"           | "10:13"   | null      | null        | null      | 400    | "startTime"   | "must be multiple of '15'"
-            "name"           | null      | null      | -30         | null      | 400    | "durationMin" | "must be greater than or equal to 30 minutes"
-            "name"           | null      | null      | 16          | null      | 400    | "durationMin" | "must be greater than or equal to 30 minutes"
-            "name"           | null      | null      | 47          | null      | 400    | "durationMin" | "must be multiple of '15'"
-            "name"           | null      | yesterday | null        | null      | 400    | "startDay"    | "must be a date in the present or in the future"
+            name             | startTime | startDay  | durationMin | projectId | field         | violation
+            null             | null      | null      | null        | null      | "name"        | "must not be blank"
+            ""               | null      | null      | null        | null      | "name"        | "must not be blank"
+            "${random(160)}" | null      | null      | null        | null      | "name"        | "size must be between 1 and 150"
+            "name"           | "10:13"   | null      | null        | null      | "startTime"   | "must be multiple of '15'"
+            "name"           | null      | null      | -30         | null      | "durationMin" | "must be greater than or equal to 30 minutes"
+            "name"           | null      | null      | 16          | null      | "durationMin" | "must be greater than or equal to 30 minutes"
+            "name"           | null      | null      | 47          | null      | "durationMin" | "must be multiple of '15'"
+            "name"           | null      | yesterday | null        | null      | "startDay"    | "must be a date in the present or in the future"
     }
 
     private static String getWrongTime() {
@@ -231,7 +231,7 @@ class TasksControllerTest extends UserInitializedSpecification {
                     .content(json)
                     .with(userIdJwt()))
         then:
-            response.andExpect(status().is(status))
+            response.andExpect(status().isBadRequest())
                     .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
                     .andExpect(jsonPath("\$.violations[?(@.field == '${field}')].message", hasItem(violation)))
             tasksRepository.findById(task.id).orElseThrow().with {
@@ -242,14 +242,14 @@ class TasksControllerTest extends UserInitializedSpecification {
                 assert it.durationMin == task.durationMin
             }
         where:
-            name             | startTime | startDay  | durationMin | projectId | status | field         | violation
-            ""               | null      | null      | null        | null      | 400    | "name"        | "must be null or not blank"
-            "${random(160)}" | null      | null      | null        | null      | 400    | "name"        | "size must be between 1 and 150"
-            null             | "10:13"   | null      | null        | null      | 400    | "startTime"   | "must be multiple of '15'"
-            null             | null      | null      | -30         | null      | 400    | "durationMin" | "must be greater than or equal to 30 minutes"
-            null             | null      | null      | 16          | null      | 400    | "durationMin" | "must be greater than or equal to 30 minutes"
-            null             | null      | null      | 47          | null      | 400    | "durationMin" | "must be multiple of '15'"
-            null             | null      | yesterday | null        | null      | 400    | "startDay"    | "must be a date in the present or in the future"
+            name             | startTime | startDay  | durationMin | projectId | field         | violation
+            ""               | null      | null      | null        | null      | "name"        | "must be null or not blank"
+            "${random(160)}" | null      | null      | null        | null      | "name"        | "size must be between 1 and 150"
+            null             | "10:13"   | null      | null        | null      | "startTime"   | "must be multiple of '15'"
+            null             | null      | null      | -30         | null      | "durationMin" | "must be greater than or equal to 30 minutes"
+            null             | null      | null      | 16          | null      | "durationMin" | "must be greater than or equal to 30 minutes"
+            null             | null      | null      | 47          | null      | "durationMin" | "must be multiple of '15'"
+            null             | null      | yesterday | null        | null      | "startDay"    | "must be a date in the present or in the future"
     }
 
     def "should delete task"() {

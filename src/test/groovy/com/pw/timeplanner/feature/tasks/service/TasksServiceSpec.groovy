@@ -11,6 +11,7 @@ import com.pw.timeplanner.feature.tasks.entity.TaskEntity
 import com.pw.timeplanner.feature.tasks.entity.TaskEntityMapper
 import com.pw.timeplanner.feature.tasks.entity.TaskEntityMapperImpl
 import com.pw.timeplanner.feature.tasks.repository.TasksRepository
+import com.pw.timeplanner.feature.tasks.service.validator.TasksValidator
 import org.openapitools.jackson.nullable.JsonNullable
 import spock.lang.Specification
 

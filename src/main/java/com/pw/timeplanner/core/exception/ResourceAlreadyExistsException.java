@@ -7,6 +7,6 @@ public class ResourceAlreadyExistsException extends AbstractThrowableProblem {
 
         public ResourceAlreadyExistsException(String resource, String fieldName, String fieldValue) {
             super(null, "Resource already exists", Status.CONFLICT,
-                    String.format("Resource %s with field '%s': '%s' already exists", resource,fieldName, fieldValue));
+                    String.format("Resource %s with field '%s': '%s' already exists", resource, fieldName, fieldValue));
         }
 }

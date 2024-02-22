@@ -10,6 +10,7 @@ import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntityMapper;
 import com.pw.timeplanner.feature.tasks.repository.TasksRepository;
+import com.pw.timeplanner.feature.tasks.service.validator.TasksValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

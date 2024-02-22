@@ -3,6 +3,7 @@ package com.pw.timeplanner.feature.tasks.api.projectDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pw.timeplanner.core.validation.NullOrNotBlank;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ import java.time.LocalTime;
 public class UpdateProjectDTO implements Serializable {
 
     @NullOrNotBlank
+    @Size(min = 1, max = 25)
     String name;
 
     @Schema(type = "String", pattern = "HH:mm", nullable = true)

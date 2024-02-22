@@ -7,12 +7,9 @@ import com.pw.timeplanner.feature.tasks.api.dto.UpdateTaskDTO;
 import com.pw.timeplanner.feature.tasks.service.TasksService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 import static com.pw.timeplanner.core.AuthUtils.getUserIdFromToken;
@@ -23,12 +20,6 @@ import static com.pw.timeplanner.core.AuthUtils.getUserIdFromToken;
 public class TasksController implements TasksResource {
 
     private final TasksService tasksService;
-    @Override
-    public List<TaskDTO> getTasks(JwtAuthenticationToken authentication, @DateTimeFormat LocalDate day) {
-        String userId = getUserIdFromToken(authentication);
-        //TODO: userId must be present, throw if not
-        return tasksService.getTasksByDate(userId, day);
-    }
 
     @Override
     public TaskDTO getTask(JwtAuthenticationToken authentication, UUID taskId) {
