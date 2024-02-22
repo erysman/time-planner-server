@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -24,6 +25,8 @@ import java.util.UUID;
 public interface ProjectsResource {
 
     String RESOURCE_PATH = "/projects";
+
+    String ORDER_PATH = "/order";
 
     @GetMapping
     @Operation(summary = "Get projects", responses = {@ApiResponse(responseCode = "200", description = "OK"),
@@ -48,5 +51,17 @@ public interface ProjectsResource {
     @PostMapping
     ProjectDTO createProject(JwtAuthenticationToken authentication,
                              @RequestBody @Validated CreateProjectDTO createProjectDTO);
+
+    @GetMapping("/{id}/tasks" + ORDER_PATH)
+    @Operation(summary = "Get order of project's tasks", responses = {@ApiResponse(responseCode = "200",
+            description = "OK"), @ApiResponse(responseCode = "403", description = "Unauthorized")})
+    List<UUID> getTasksProjectOrder(JwtAuthenticationToken authentication, @PathVariable("id") UUID id);
+
+    @PutMapping("/{id}/tasks" + ORDER_PATH)
+    @Operation(summary = "Update order of project's tasks", responses = {@ApiResponse(responseCode = "200",
+            description = "OK"), @ApiResponse(responseCode = "403", description = "Unauthorized"),
+            @ApiResponse(responseCode = "400", description = "Bad request")})
+    List<UUID> updateTasksProjectOrder(JwtAuthenticationToken authentication, @PathVariable("id") UUID id,
+                                   @RequestBody List<UUID> positions);
 
 }

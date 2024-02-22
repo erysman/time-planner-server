@@ -58,4 +58,16 @@ public class ProjectController implements ProjectsResource {
         String userId = getUserIdFromToken(authentication);
         return projectService.createProject(userId, createProjectDTO);
     }
+
+    @Override
+    public List<UUID> getTasksProjectOrder(JwtAuthenticationToken authentication, UUID id) {
+        String userId = getUserIdFromToken(authentication);
+        return projectService.getTasksOrderForProject(userId, id);
+    }
+
+    @Override
+    public List<UUID> updateTasksProjectOrder(JwtAuthenticationToken authentication, UUID id, List<UUID> positions) {
+        String userId = getUserIdFromToken(authentication);
+        return projectService.updateTasksOrderForProject(userId, id, positions);
+    }
 }

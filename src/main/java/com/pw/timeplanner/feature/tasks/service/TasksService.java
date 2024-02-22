@@ -83,7 +83,9 @@ public class TasksService {
             entity.setAutoScheduled(false);
         }
         if (updateTaskDTO.getProjectId() != null) {
-            entity.setProject(projectService.getProjectEntity(userId, updateTaskDTO.getProjectId()));
+            ProjectEntity updateProject = projectService.getProjectEntity(userId, updateTaskDTO.getProjectId());
+            tasksOrderService.updateProjectOrder(userId, entity, updateProject);
+            entity.setProject(updateProject);
         }
         mapper.update(updateTaskDTO, entity);
         return mapper.toDTO(entity);

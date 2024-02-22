@@ -1,5 +1,6 @@
 package com.pw.timeplanner.feature.tasks.service
 
+import com.pw.timeplanner.feature.tasks.entity.ProjectEntity
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity
 import com.pw.timeplanner.feature.tasks.repository.TasksRepository
 import com.pw.timeplanner.feature.tasks.service.exceptions.ListOrderException
@@ -55,18 +56,23 @@ class TasksOrderServiceTest extends Specification {
 
     def "should set order for project and startDay"() {
         given:
-            def taskEntity = TaskEntity.builder().id(UUID.randomUUID()).startDay(day).build()
+            def project = ProjectEntity.builder().id(UUID.randomUUID()).name("Project 1").userId(userId).build()
+            def taskEntity = TaskEntity.builder().id(UUID.randomUUID()).startDay(day).project(project).userId(userId).build()
         when:
             service.setOrderForDayAndProject(userId, taskEntity)
         then:
             1 * tasksRepository.findLastDayOrder(userId, day) >> Optional.of(maxDayOrder)
+            1 * tasksRepository.findLastProjectOrder(userId, project) >> Optional.of(maxProjectOrder)
             taskEntity.dayOrder == maxDayOrder + 1
+            taskEntity.projectOrder == maxProjectOrder + 1
         where:
             maxDayOrder << [0, 5, 10, 99]
+            maxProjectOrder << [3, 0, 15, 200]
     }
 
-    def "should not set order for project and startDay, when startTime is present"() {
+    def "should not set order for startDay, when startTime is present"() {
         given:
+            tasksRepository.findLastProjectOrder(*_) >> Optional.empty()
             def taskEntity = TaskEntity.builder().id(UUID.randomUUID()).startDay(startDay).startTime(startTime).build()
         when:
             service.setOrderForDayAndProject(userId, taskEntity)
@@ -86,7 +92,7 @@ class TasksOrderServiceTest extends Specification {
             service.unsetDayOrder(userId, taskEntity)
         then:
             taskEntity.dayOrder == null
-            1 * tasksRepository.shiftOrderOfAllTasksAfterDeletedOne(userId, taskEntity.getStartDay(), dayOrder);
+            1 * tasksRepository.shiftDayOrderOfAllTasksAfterDeletedOne(userId, taskEntity.getStartDay(), dayOrder);
     }
 
     def "should not unset day order"() {
@@ -97,10 +103,10 @@ class TasksOrderServiceTest extends Specification {
             service.unsetDayOrder(userId, taskEntity)
         then:
             taskEntity.dayOrder == null
-            1 * tasksRepository.shiftOrderOfAllTasksAfterDeletedOne(userId, taskEntity.getStartDay(), dayOrder);
+            1 * tasksRepository.shiftDayOrderOfAllTasksAfterDeletedOne(userId, taskEntity.getStartDay(), dayOrder);
     }
 
-    def "should update tasks order for day"() {
+    def "should update tasks day order for tasks without order or with not continuous order"() {
         when:
             service.updateDayOrder(userId, day)
         then:
@@ -115,6 +121,31 @@ class TasksOrderServiceTest extends Specification {
             [buildOrderTask(0), buildOrderTask(), buildOrderTask(), buildOrderTask()] | [0, 1, 2, 3]
             [buildOrderTask(), buildOrderTask(), buildOrderTask()]                    | [0, 1, 2]
             [buildOrderTask(0), buildOrderTask(), buildTimeTask()]                    | [0, 1, null]
+    }
+
+    def "should set task's project order and shift order in previous project when updating task's project"() {
+        given:
+            def defaultProject = ProjectEntity.builder().id(UUID.randomUUID()).userId(userId).name("inbox").build()
+            def project = ProjectEntity.builder().id(UUID.randomUUID()).userId(userId).name("Project 1").build()
+            def task = TaskEntity.builder().id(UUID.randomUUID()).name("Task").project(defaultProject).projectOrder(0).build()
+            tasksRepository.findLastProjectOrder(userId, project) >> Optional.of(8)
+        when:
+            service.updateProjectOrder(userId, task, project)
+        then:
+            task.projectOrder == 9
+            1 * tasksRepository.shiftProjectOrderOfAllTasksAfterDeletedOne(userId, defaultProject, 0)
+    }
+
+    def "should not change task's project order when updating task's project to previous one"() {
+        given:
+            def defaultProject = ProjectEntity.builder().id(UUID.randomUUID()).userId(userId).name("inbox").build()
+            def task = TaskEntity.builder().id(UUID.randomUUID()).name("Task").project(defaultProject).projectOrder(8).build()
+            tasksRepository.findLastProjectOrder(userId, defaultProject) >> Optional.of(8)
+        when:
+            service.updateProjectOrder(userId, task, defaultProject)
+        then:
+            task.projectOrder == 8
+            0 * tasksRepository.shiftProjectOrderOfAllTasksAfterDeletedOne(userId, _, _)
     }
 
     @Unroll
@@ -147,7 +178,7 @@ class TasksOrderServiceTest extends Specification {
             service.updateDayOrder(userId, task, updateStartDay, updateStartTime)
         then:
             task.dayOrder == expectedOrder
-            1 * tasksRepository.shiftOrderOfAllTasksAfterDeletedOne(userId, day, existingOrder)
+            1 * tasksRepository.shiftDayOrderOfAllTasksAfterDeletedOne(userId, day, existingOrder)
         where:
             existingOrder | updateStartDay                   | updateStartTime                  | expectedOrder
             0             | JsonNullable.of(null)            | null                             | null

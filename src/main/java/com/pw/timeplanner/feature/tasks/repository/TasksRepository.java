@@ -1,6 +1,7 @@
 package com.pw.timeplanner.feature.tasks.repository;
 
 
+import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.QueryHint;
@@ -50,6 +51,9 @@ public interface TasksRepository extends JpaRepository<TaskEntity, UUID> {
     @Query("select t.id from TaskEntity t where t.userId = :userId and t.startDay = :startDay and t.dayOrder is not null order by t.dayOrder")
     List<UUID> findTaskIdsOrderedByDayOrder(@Param("userId") String userId, @Param("startDay") LocalDate startDay);
 
+    @Query("select t.id from TaskEntity t where t.userId = :userId and t.project = :project and t.projectOrder is not null order by t.projectOrder")
+    List<UUID> findTaskIdsOrderedByProject(@Param("userId") String userId, @Param("project") ProjectEntity project);
+
     @Query("select t.id from TaskEntity t where t.userId = :userId and t.startDay = :startDay and t.dayOrder is not null ")
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Set<UUID> findAndLockTaskIdsWithDayOrder(@Param("userId") String userId, @Param("startDay") LocalDate startDay);
@@ -58,16 +62,24 @@ public interface TasksRepository extends JpaRepository<TaskEntity, UUID> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Set<TaskEntity> findAndLockTasksWithDayOrder(@Param("userId") String userId, @Param("startDay") LocalDate startDay);
 
-    @Query("update TaskEntity t SET t.dayOrder = :dayOrder where t.id = :id and t.userId = :userId")
-    @Modifying
-    int updateDayOrder(@Param("userId") String userId, @Param("id") UUID id, @Param("dayOrder") Integer dayOrder);
+    @Query("select t from TaskEntity t where t.userId = :userId and t.project = :project and t.projectOrder is not null ")
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Set<TaskEntity> findAndLockTasksWithProjectOrder(@Param("userId") String userId, @Param("project") ProjectEntity project);
 
     @Query("select max(t.dayOrder) from TaskEntity t where t.userId = :userId and t.startDay = :startDay group by t.startDay")
     Optional<Integer> findLastDayOrder(@Param("userId") String userId, @Param("startDay") LocalDate startDay);
 
+    @Query("select max(t.projectOrder) from TaskEntity t where t.userId = :userId and t.project = :project group by t.project")
+    Optional<Integer> findLastProjectOrder(@Param("userId") String userId, @Param("project") ProjectEntity project);
+
     @Query("update TaskEntity t set t.dayOrder = t.dayOrder-1 where t.userId = :userId and t.startDay = :startDay and t.dayOrder > :deletedPosition")
     @Modifying
-    int shiftOrderOfAllTasksAfterDeletedOne(@Param("userId") String userId, @Param("startDay") LocalDate startDay, @Param("deletedPosition") Integer deletedPosition);
+    void shiftDayOrderOfAllTasksAfterDeletedOne(@Param("userId") String userId, @Param("startDay") LocalDate startDay, @Param("deletedPosition") Integer deletedPosition);
+
+    @Query("update TaskEntity t set t.projectOrder = t.projectOrder-1 where t.userId = :userId and t.project = :project and t.projectOrder > :deletedPosition")
+    @Modifying
+    void shiftProjectOrderOfAllTasksAfterDeletedOne(@Param("userId") String userId, @Param("project") ProjectEntity project, @Param("deletedPosition") Integer deletedPosition);
+
 
     @Query("select count(*) from TaskEntity t where t.userId = :userId and t.startDay = :startDay and t.autoScheduled = true")
     int countAutoScheduledTasks(@Param("userId") String userId, @Param("startDay") LocalDate startDay);

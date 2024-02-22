@@ -5,9 +5,9 @@ spring:
   liquibase:
     enabled: true
   datasource:
-    url: jdbc:mysql://aws.connect.psdb.cloud/time-planner?sslMode=VERIFY_IDENTITY
-    username: 7ynmk8ie3qf8lxvym840
-    password: pscale_pw_SQtm0cPLC7HNiy54tE2P9lUAlRJXRZj0WIJJAabEaSz
+    url: jdbc:mysql://localhost/time_planner
+    username: user
+    password: password
   jpa:
     hibernate:
       ddl-auto: validate

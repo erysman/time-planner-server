@@ -150,6 +150,7 @@ class TasksServiceSpec extends Specification {
         then:
             1 * tasksRepository.findAndLockOneByUserIdAndId(userId, taskId) >> Optional.of(taskEntity)
             1 * tasksValidator.validate(updateTaskDto)
+            1 * tasksOrderService.updateProjectOrder(userId, taskEntity, newProject)
             1 * projectsService.getProjectEntity(userId, newProjectId) >> newProject
             taskEntity.project == newProject
             updatedTaskDTO.projectId == newProjectId

@@ -38,7 +38,7 @@ public interface DayTasksResource {
     @PutMapping(ORDER_PATH)
     @Operation(summary = "Update tasks order on day's list", responses = {@ApiResponse(responseCode = "200",
             description = "OK"), @ApiResponse(responseCode = "403", description = "Unauthorized"),
-            @ApiResponse(responseCode = "409", description = "Data conflict")})
+            @ApiResponse(responseCode = "400", description = "Bad request")})
     List<UUID> updateTasksDayOrder(JwtAuthenticationToken authentication, @PathVariable("day") LocalDate day,
                                    @RequestBody List<UUID> positions);
 

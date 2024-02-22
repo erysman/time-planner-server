@@ -1,5 +1,6 @@
 package com.pw.timeplanner.feature.tasks.service;
 
+import com.pw.timeplanner.feature.tasks.entity.ProjectEntity;
 import com.pw.timeplanner.feature.tasks.entity.TaskEntity;
 import com.pw.timeplanner.feature.tasks.repository.TasksRepository;
 import com.pw.timeplanner.feature.tasks.service.exceptions.ListOrderException;
@@ -33,56 +34,90 @@ public class TasksOrderService {
         return tasksRepository.findTaskIdsOrderedByDayOrder(userId, day);
     }
 
+    public List<UUID> getTasksOrderForProject(String userId, ProjectEntity project) {
+        log.info("Getting tasks order for user: {} and project: {}", userId, project.getId());
+        return tasksRepository.findTaskIdsOrderedByProject(userId, project);
+    }
+
     @Transactional
-    public List<UUID> reorderTasksForDay(String userId, LocalDate day, List<UUID> tasksOrder) {
-        Set<TaskEntity> previousTaskOrder = tasksRepository.findAndLockTasksWithDayOrder(userId, day);
-        Set<UUID> existingTasksIds = previousTaskOrder.stream()
+    public List<UUID> reorderTasksForProject(String userId, ProjectEntity project, List<UUID> newTasksOrder) {
+        log.info("Reordering tasks for user: {} and project: {} with new order: {}", userId, project.getId(), newTasksOrder);
+        Set<TaskEntity> tasksWithProjectOrder = tasksRepository.findAndLockTasksWithProjectOrder(userId, project);
+        validateTaskOrder(newTasksOrder, tasksWithProjectOrder);
+        newTasksOrder.forEach(taskId -> tasksWithProjectOrder.stream()
+                .filter(task -> task.getId().equals(taskId))
+                .forEach(task -> task.setProjectOrder(newTasksOrder.indexOf(taskId)))
+        );
+        return tasksWithProjectOrder.stream()
+                .sorted(Comparator.comparing(TaskEntity::getProjectOrder))
+                .map(TaskEntity::getId)
+                .collect(Collectors.toList());
+    }
+
+    private static void validateTaskOrder(List<UUID> tasksOrder, Set<TaskEntity> tasksWithOrder) {
+        Set<UUID> existingTasksIds = tasksWithOrder.stream()
                 .map(TaskEntity::getId)
                 .collect(Collectors.toSet());
-        Set<UUID> newTasksOrderIds = new HashSet<>(tasksOrder);
-        boolean allPreviousTasksPresent = newTasksOrderIds.containsAll(existingTasksIds);
-        boolean allTasksExists = existingTasksIds.containsAll(newTasksOrderIds);
-        boolean isNewOrderDistinct = newTasksOrderIds.size() == tasksOrder.size();
+        Set<UUID> tasksOrderIds = new HashSet<>(tasksOrder);
+        boolean allPreviousTasksPresent = tasksOrderIds.containsAll(existingTasksIds);
+        boolean allTasksExists = existingTasksIds.containsAll(tasksOrderIds);
+        boolean isNewOrderDistinct = tasksOrderIds.size() == tasksOrder.size();
         if (!allPreviousTasksPresent) {
-            existingTasksIds.removeAll(newTasksOrderIds);
+            existingTasksIds.removeAll(tasksOrderIds);
             throw new ListOrderException("Missing task ids: " + existingTasksIds);
         }
         if (!allTasksExists) {
-            newTasksOrderIds.removeAll(existingTasksIds);
-            throw new ListOrderException("Non-existent task ids: " + newTasksOrderIds);
+            tasksOrderIds.removeAll(existingTasksIds);
+            throw new ListOrderException("Non-existent task ids: " + tasksOrderIds);
         }
         if (!isNewOrderDistinct) {
             throw new ListOrderException("Tasks ids are not distinct: " + getDuplicateIds(tasksOrder));
         }
-        tasksOrder.forEach(taskId -> previousTaskOrder.stream()
+    }
+
+    @Transactional
+    public List<UUID> reorderTasksForDay(String userId, LocalDate day, List<UUID> newTasksOrder) {
+        log.info("Reordering tasks for user: {} and day: {} with new order: {}", userId, day, newTasksOrder);
+        Set<TaskEntity> tasksWithDayOrder = tasksRepository.findAndLockTasksWithDayOrder(userId, day);
+        validateTaskOrder(newTasksOrder, tasksWithDayOrder);
+        newTasksOrder.forEach(taskId -> tasksWithDayOrder.stream()
                 .filter(task -> task.getId().equals(taskId))
-                .forEach(task -> task.setDayOrder(tasksOrder.indexOf(taskId)))
+                .forEach(task -> task.setDayOrder(newTasksOrder.indexOf(taskId)))
         );
-        return previousTaskOrder.stream()
+        return tasksWithDayOrder.stream()
                 .sorted(Comparator.comparing(TaskEntity::getDayOrder))
                 .map(TaskEntity::getId)
                 .collect(Collectors.toList());
     }
 
     private static Set<String> getDuplicateIds(List<UUID> newTasksOrderIds) {
-        Set<String> collected = newTasksOrderIds.stream()
+        return newTasksOrderIds.stream()
                 .filter(id -> newTasksOrderIds.stream()
                         .filter(id::equals)
                         .count() > 1)
                 .map(UUID::toString)
                 .collect(Collectors.toSet());
-        return collected;
     }
 
     @Transactional
     public void setOrderForDayAndProject(String userId, TaskEntity taskEntity) {
-        /*
-            if startDate exist, but startTime not, then set dayListPosition to last+1
-            TODO: if project exist, then set projectListPosition to last+1
-         */
+        setProjectOrder(userId, taskEntity);
         if (taskEntity.getStartDay() != null && taskEntity.getStartTime() == null) {
-            this.setDayOrder(userId, taskEntity, taskEntity.getStartDay());
+            this.setDayOrder(userId, taskEntity);
         }
+    }
+
+    private void setProjectOrder(String userId, TaskEntity taskEntity) {
+        setProjectOrder(userId, taskEntity, taskEntity.getProject());
+    }
+    private void setProjectOrder(String userId, TaskEntity taskEntity, ProjectEntity project) {
+        int lastPosition = tasksRepository.findLastProjectOrder(userId, project)
+                .orElse(-1);
+        taskEntity.setProjectOrder(lastPosition + 1);
+    }
+
+    private void setDayOrder(String userId, TaskEntity taskEntity) {
+        setDayOrder(userId, taskEntity, taskEntity.getStartDay());
     }
 
     private void setDayOrder(String userId, TaskEntity taskEntity, LocalDate day) {
@@ -93,25 +128,34 @@ public class TasksOrderService {
 
     @Transactional
     public void unsetOrderForDayAndProject(String userId, TaskEntity taskEntity) {
+        this.unsetProjectOrder(userId, taskEntity);
         this.unsetDayOrder(userId, taskEntity);
+    }
+
+    private void unsetProjectOrder(String userId, TaskEntity taskEntity) {
+        if(hasProjectOrder(taskEntity)) {
+            tasksRepository.shiftProjectOrderOfAllTasksAfterDeletedOne(userId, taskEntity.getProject(),
+                    taskEntity.getProjectOrder());
+            taskEntity.setProjectOrder(null);
+        }
     }
 
     @Transactional
     public void unsetDayOrder(String userId, TaskEntity taskEntity) {
-        /*
-            if taskEntity has dayListPosition:
-                update all taskEntities with higher dayposition to their position -1.
-            TODO: if taskEntity has projectListPosition
-                update all taskEntities with higher dayposition to their position -1.
-         */
         if (hasDayOrder(taskEntity)) {
-            tasksRepository.shiftOrderOfAllTasksAfterDeletedOne(userId, taskEntity.getStartDay(),
+            tasksRepository.shiftDayOrderOfAllTasksAfterDeletedOne(userId, taskEntity.getStartDay(),
                     taskEntity.getDayOrder());
             taskEntity.setDayOrder(null);
         }
     }
 
-    //update day order for all tasks in the day
+    /**
+     * Updates day order for all tasks in the day.
+     * Fixes day order to be continuous and without gaps.
+     * Fills missing day order for tasks without start time.
+     * @param userId
+     * @param day
+     */
     @Transactional
     public void updateDayOrder(String userId, LocalDate day) {
         List<TaskEntity> taskEntities = tasksRepository.findAndLockAllByUserIdAndStartDayAndStartTimeIsNull(userId,
@@ -138,6 +182,17 @@ public class TasksOrderService {
         taskEntities.stream()
                 .filter(taskEntity -> taskEntity.getStartTime() == null && taskEntity.getDayOrder() == null)
                 .forEach(taskEntity -> taskEntity.setDayOrder(dayOrderCounter.incrementAndGet()));
+    }
+
+    @Transactional
+    public void updateProjectOrder(String userId, TaskEntity entity, ProjectEntity updateProject) {
+        if (hasProjectOrder(entity)) {
+            if (entity.getProject().equals(updateProject)) {
+                return;
+            }
+            unsetProjectOrder(userId, entity);
+        }
+        setProjectOrder(userId, entity, updateProject);
     }
 
 
@@ -169,6 +224,10 @@ public class TasksOrderService {
 
     private static boolean hasDayOrder(TaskEntity task) {
         return task.getDayOrder() != null;
+    }
+
+    private static boolean hasProjectOrder(TaskEntity task) {
+        return task.getProjectOrder() != null;
     }
 
     private static boolean shouldSetDayOrderToDifferentDay(JsonNullable<LocalDate> updateStartDay, LocalDate startDay) {

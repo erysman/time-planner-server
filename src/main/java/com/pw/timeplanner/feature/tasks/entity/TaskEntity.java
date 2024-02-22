@@ -52,6 +52,8 @@ public class TaskEntity extends BaseEntity {
 
     private Integer dayOrder;
 
+    private Integer projectOrder;
+
     @Column(nullable = false)
     private String userId;
 
