@@ -28,7 +28,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Slf4j
 public class ScheduleService {
-    private final TasksOrderService orderService;
+    private final TasksDayOrderService orderService;
     private final TasksRepository tasksRepository;
     private final BannedRangesService bannedRangesService;
     private final SchedulingServerClient client;
@@ -84,7 +84,7 @@ public class ScheduleService {
                             });
                 });
         //update day order for all tasks in the day
-        orderService.updateDayOrder(userId, day);
+        orderService.updateOrder(userId, day);
     }
 
     private List<Task> prepareTasks(List<TaskEntity> taskEntities) {
@@ -136,7 +136,7 @@ public class ScheduleService {
                     taskEntity.setScheduleRunId(null);
                 });
         //set day order for all tasks without start time in the day
-        orderService.updateDayOrder(userId, day);
+        orderService.updateOrder(userId, day);
     }
 
     private double getDurationHours(TaskEntity e) {

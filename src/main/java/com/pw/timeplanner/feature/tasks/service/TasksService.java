@@ -28,7 +28,8 @@ public class TasksService {
     private final ProjectService projectService;
     private final TasksRepository tasksRepository;
     private final TaskEntityMapper mapper;
-    private final TasksOrderService tasksOrderService;
+    private final TasksDayOrderService tasksDayOrderService;
+    private final TasksProjectOrderService tasksProjectOrderService;
     private final TasksValidator tasksValidator;
     private final TasksProperties properties;
 
@@ -39,7 +40,8 @@ public class TasksService {
         TaskEntity entity = mapper.createEntity(createTaskDTO);
         entity.setUserId(userId);
         entity.setProject(projectEntity);
-        tasksOrderService.setOrderForDayAndProject(userId, entity);
+        tasksDayOrderService.setOrder(userId, entity);
+        tasksProjectOrderService.setOrder(userId, entity);
         TaskEntity saved = tasksRepository.save(entity);
         return mapper.toDTO(saved);
     }
@@ -68,7 +70,8 @@ public class TasksService {
     public void deleteTask(String userId, UUID taskId) {
         TaskEntity entity = tasksRepository.findOneByUserIdAndId(userId, taskId)
                 .orElseThrow(() -> new ResourceNotFoundException(TasksResource.RESOURCE_PATH, taskId));
-        tasksOrderService.unsetOrderForDayAndProject(userId, entity);
+        tasksDayOrderService.unsetOrder(userId, entity);
+        tasksProjectOrderService.unsetOrder(userId, entity);
         tasksRepository.delete(entity);
     }
 
@@ -79,12 +82,12 @@ public class TasksService {
                 .orElseThrow(() -> new ResourceNotFoundException(TasksResource.RESOURCE_PATH, taskId));
         tasksValidator.validate(updateTaskDTO);
         if (updateTaskDTO.getStartTime() != null || updateTaskDTO.getStartDay() != null) {
-            tasksOrderService.updateDayOrder(userId, entity, updateTaskDTO.getStartDay(), updateTaskDTO.getStartTime());
+            tasksDayOrderService.updateOrder(userId, entity, updateTaskDTO.getStartDay(), updateTaskDTO.getStartTime());
             entity.setAutoScheduled(false);
         }
         if (updateTaskDTO.getProjectId() != null) {
             ProjectEntity updateProject = projectService.getProjectEntity(userId, updateTaskDTO.getProjectId());
-            tasksOrderService.updateProjectOrder(userId, entity, updateProject);
+            tasksProjectOrderService.updateOrder(userId, entity, updateProject);
             entity.setProject(updateProject);
         }
         mapper.update(updateTaskDTO, entity);

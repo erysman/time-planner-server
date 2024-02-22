@@ -16,7 +16,7 @@ import java.time.LocalTime
 class ScheduleServiceSpec extends Specification {
 
     TimeConverter timeConverter = new TimeConverter(properties)
-    def orderService = Mock(TasksOrderService)
+    def orderService = Mock(TasksDayOrderService)
     def tasksRepository = Mock(TasksRepository)
     def bannedRangesService = Mock(BannedRangesService)
     def client = Mock(SchedulingServerClient)
@@ -42,7 +42,7 @@ class ScheduleServiceSpec extends Specification {
         when: "schedule method is called"
             scheduleService.schedule(userId, day)
         then: "scheduled tasks are updated correctly"
-            1 * orderService.updateDayOrder(userId, day)
+            1 * orderService.updateOrder(userId, day)
             task1.with {
                 it.startTime == timeConverter.numberToTime(scheduledTask1.startTime)
                 it.durationMin == defaultDurationMin
@@ -59,7 +59,7 @@ class ScheduleServiceSpec extends Specification {
             scheduleService.schedule(userId, day)
         then: "client is not called"
             0 * client.scheduleTasks(_, _, _)
-            0 * orderService.updateDayOrder(userId, day)
+            0 * orderService.updateOrder(userId, day)
     }
 
     def "revokeSchedule method modifies autoScheduled tasks"() {
@@ -79,7 +79,7 @@ class ScheduleServiceSpec extends Specification {
         when: "schedule method is called"
             scheduleService.revokeSchedule(userId, day)
         then: "scheduled tasks are updated correctly"
-            1 * orderService.updateDayOrder(userId, day)
+            1 * orderService.updateOrder(userId, day)
             task1.with {
                 it.startTime == null
                 it.dayOrder == 0

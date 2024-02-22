@@ -36,7 +36,7 @@ public class ProjectService {
     private final TaskEntityMapper taskMapper;
     private final TasksProperties properties;
     private final ProjectsValidator projectsValidator;
-    private final TasksOrderService tasksOrderService;
+    private final TasksProjectOrderService tasksOrderService;
 
     public List<ProjectDTO> getProjects(String userId) {
         log.info("Getting projects for user: {}", userId);
@@ -136,11 +136,11 @@ public class ProjectService {
 
     public List<UUID> getTasksOrderForProject(String userId, UUID id) {
         ProjectEntity project = getProjectEntity(userId, id);
-        return tasksOrderService.getTasksOrderForProject(userId, project);
+        return tasksOrderService.getOrder(userId, project);
     }
 
     public List<UUID> updateTasksOrderForProject(String userId, UUID id, List<UUID> positions) {
         ProjectEntity project = getProjectEntity(userId, id);
-        return tasksOrderService.reorderTasksForProject(userId, project, positions);
+        return tasksOrderService.reorder(userId, project, positions);
     }
 }

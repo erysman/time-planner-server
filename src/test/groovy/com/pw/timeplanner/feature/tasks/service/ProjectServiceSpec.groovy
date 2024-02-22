@@ -18,7 +18,7 @@ class ProjectServiceSpec extends Specification {
     def taskEntityMapper = Mock(TaskEntityMapper)
     def tasksProperties = Mock(TasksProperties)
     def projectsValidator = Mock(ProjectsValidator)
-    def tasksOrderService = Mock(TasksOrderService)
+    def tasksOrderService = Mock(TasksProjectOrderService)
     def projectService = new ProjectService(projectsRepository, projectEntityMapper, taskEntityMapper, tasksProperties, projectsValidator, tasksOrderService)
 
     def "validate getProjects returns correct number of projects for a user"() {

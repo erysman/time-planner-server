@@ -25,9 +25,10 @@ class TasksServiceSpec extends Specification {
     ProjectService projectsService = Mock(ProjectService)
     TasksRepository tasksRepository = Mock(TasksRepository)
     TaskEntityMapper taskEntityMapper = new TaskEntityMapperImpl(new JsonNullableMapperImpl())
-    TasksOrderService tasksOrderService = Mock(TasksOrderService)
+    TasksDayOrderService tasksDayOrderService = Mock(TasksDayOrderService)
+    TasksProjectOrderService tasksProjectOrderService = Mock(TasksProjectOrderService)
     TasksValidator tasksValidator = Mock(TasksValidator)
-    TasksService tasksService = new TasksService(projectsService, tasksRepository, taskEntityMapper, tasksOrderService, tasksValidator, properties)
+    TasksService tasksService = new TasksService(projectsService, tasksRepository, taskEntityMapper, tasksDayOrderService, tasksProjectOrderService, tasksValidator, properties)
 
     def "should create task with projectId"() {
         given:
@@ -46,7 +47,8 @@ class TasksServiceSpec extends Specification {
             1 * tasksValidator.validate(taskDto)
             1 * projectsService.getProjectEntity(userId, projectId) >> project
             1 * tasksRepository.save(_ as TaskEntity) >> { TaskEntity taskEntity -> taskEntity }
-            1 * tasksOrderService.setOrderForDayAndProject(userId, _ as TaskEntity)
+            1 * tasksDayOrderService.setOrder(userId, _ as TaskEntity)
+            1 * tasksProjectOrderService.setOrder(userId, _ as TaskEntity)
             assertCreateTaskDTO(createdTaskDTO, taskDto, projectId)
     }
 
@@ -67,7 +69,8 @@ class TasksServiceSpec extends Specification {
             1 * tasksValidator.validate(taskDto)
             1 * projectsService.getOrCreateDefaultProjectEntity(userId) >> defaultProject
             1 * tasksRepository.save(_ as TaskEntity) >> { TaskEntity taskEntity -> taskEntity }
-            1 * tasksOrderService.setOrderForDayAndProject(userId, _ as TaskEntity)
+            1 * tasksDayOrderService.setOrder(userId, _ as TaskEntity)
+            1 * tasksProjectOrderService.setOrder(userId, _ as TaskEntity)
             assertCreateTaskDTO(createdTaskDTO, taskDto, defaultProject.id)
     }
 
@@ -90,7 +93,8 @@ class TasksServiceSpec extends Specification {
         then:
             1 * tasksRepository.findOneByUserIdAndId(userId, taskId) >> Optional.of(taskEntity)
             1 * tasksRepository.delete(taskEntity)
-            1 * tasksOrderService.unsetOrderForDayAndProject(userId, taskEntity)
+            1 * tasksDayOrderService.unsetOrder(userId, taskEntity)
+            1 * tasksProjectOrderService.unsetOrder(userId, taskEntity)
     }
 
     def "should not delete task when it's not found"() {
@@ -101,7 +105,8 @@ class TasksServiceSpec extends Specification {
         then:
             1 * tasksRepository.findOneByUserIdAndId(userId, taskId) >> Optional.empty()
             0 * tasksRepository.delete(_)
-            0 * tasksOrderService.unsetOrderForDayAndProject(userId, _)
+            0 * tasksDayOrderService.unsetOrder(userId, _)
+            0 * tasksProjectOrderService.unsetOrder(userId, _)
             thrown(ResourceNotFoundException)
     }
 
@@ -150,7 +155,7 @@ class TasksServiceSpec extends Specification {
         then:
             1 * tasksRepository.findAndLockOneByUserIdAndId(userId, taskId) >> Optional.of(taskEntity)
             1 * tasksValidator.validate(updateTaskDto)
-            1 * tasksOrderService.updateProjectOrder(userId, taskEntity, newProject)
+            1 * tasksProjectOrderService.updateOrder(userId, taskEntity, newProject)
             1 * projectsService.getProjectEntity(userId, newProjectId) >> newProject
             taskEntity.project == newProject
             updatedTaskDTO.projectId == newProjectId
@@ -170,7 +175,7 @@ class TasksServiceSpec extends Specification {
         then:
             1 * tasksRepository.findAndLockOneByUserIdAndId(userId, taskId) >> Optional.of(taskEntity)
             1 * tasksValidator.validate(updateTaskDto)
-            1 * tasksOrderService.updateDayOrder(userId, taskEntity, newStartDay, _)
+            1 * tasksDayOrderService.updateOrder(userId, taskEntity, newStartDay, _)
             taskEntity.with {
                 it.startDay == updateTaskDto.startDay.get()
                 it.autoScheduled == false
@@ -194,7 +199,7 @@ class TasksServiceSpec extends Specification {
         then:
             1 * tasksRepository.findAndLockOneByUserIdAndId(userId, taskId) >> Optional.of(taskEntity)
             1 * tasksValidator.validate(updateTaskDto)
-            1 * tasksOrderService.updateDayOrder(userId, taskEntity, _, newStartTime)
+            1 * tasksDayOrderService.updateOrder(userId, taskEntity, _, newStartTime)
             taskEntity.with {
                 it.startTime == updateTaskDto.startTime.get()
                 it.autoScheduled == false
