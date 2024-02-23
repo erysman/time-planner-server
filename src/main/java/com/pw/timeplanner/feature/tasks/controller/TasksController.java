@@ -7,9 +7,11 @@ import com.pw.timeplanner.feature.tasks.api.dto.UpdateTaskDTO;
 import com.pw.timeplanner.feature.tasks.service.TasksService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.UUID;
 
 import static com.pw.timeplanner.core.AuthUtils.getUserIdFromToken;
@@ -40,8 +42,9 @@ public class TasksController implements TasksResource {
     }
 
     @Override
-    public TaskDTO createTask(JwtAuthenticationToken authentication, CreateTaskDTO createTaskDTO) {
+    public ResponseEntity<TaskDTO> createTask(JwtAuthenticationToken authentication, CreateTaskDTO createTaskDTO) {
         String userId = getUserIdFromToken(authentication);
-        return tasksService.createTask(userId, createTaskDTO);
+        TaskDTO task = tasksService.createTask(userId, createTaskDTO);
+        return ResponseEntity.created(URI.create("/"+task.getId())).body(task);
     }
 }

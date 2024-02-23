@@ -4,6 +4,8 @@ import com.pw.timeplanner.feature.tasks.api.dto.CreateTaskDTO;
 import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO;
 import com.pw.timeplanner.feature.tasks.api.dto.UpdateTaskDTO;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.UUID;
 
@@ -44,7 +47,8 @@ public interface TasksResource {
                        @RequestBody @Validated UpdateTaskDTO updateTaskDTO);
 
     @PostMapping
-    TaskDTO createTask(JwtAuthenticationToken authentication,
-                                 @RequestBody @Valid CreateTaskDTO createTaskDTO);
+    @ResponseStatus(HttpStatus.CREATED)
+    ResponseEntity<TaskDTO> createTask(JwtAuthenticationToken authentication,
+                                      @RequestBody @Valid CreateTaskDTO createTaskDTO);
 
 }

@@ -25,6 +25,9 @@ public interface TasksRepository extends JpaRepository<TaskEntity, UUID> {
 
     Optional<TaskEntity> findOneByUserIdAndId(String userId, UUID taskId);
 
+    @Query("SELECT t FROM TaskEntity t JOIN FETCH t.project WHERE t.userId = :userId AND t.startDay = :day")
+    Set<TaskEntity> findAllWithProjectByUserIdAndStartDay(@Param("userId") String userId, @Param("day") LocalDate day);
+
     @Query("select t from TaskEntity t where t.userId = :userId and t.id = :taskId")
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<TaskEntity> findAndLockOneByUserIdAndId(@Param("userId") String userId, @Param("taskId") UUID taskId);

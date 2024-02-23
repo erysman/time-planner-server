@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -55,14 +56,24 @@ class TasksControllerTest extends UserInitializedSpecification {
             def response = mockMvc.perform(post(TasksResource.RESOURCE_PATH).contentType(APPLICATION_JSON).content(json)
                     .with(userIdJwt()))
         then:
-            response.andExpect(status().isOk())
+            def tasks = tasksRepository.findAllWithProjectByUserIdAndStartDay(USER_ID, LocalDate.now())
+            tasks.size() == 1
+            def createdTask = tasks[0]
+            createdTask.with {
+                assert it.name == "test"
+                assert it.startTime == LocalTime.of(10, 15)
+                assert it.startDay == LocalDate.now()
+                assert it.project == defaultProject
+            }
+            response.andExpect(status().isCreated())
+                    .andExpect(header().string("Location", equalTo("/${createdTask.id}".toString())))
                     .andExpect(content().contentType(APPLICATION_JSON))
-                    .andExpect(jsonPath('$.id').exists())
+                    .andExpect(jsonPath('$.id', equalTo(createdTask.id.toString())))
                     .andExpect(jsonPath('$.projectId').exists())
                     .andExpect(jsonPath('$.name', equalTo("test")))
                     .andExpect(jsonPath('$.startTime', equalTo("10:15")))
                     .andExpect(jsonPath('$.startDay', equalTo(today)))
-            tasksRepository.findAll().size() == 1
+
     }
 
     def "should return error when trying to create task with invalid data"() {
@@ -117,7 +128,6 @@ class TasksControllerTest extends UserInitializedSpecification {
 
     def "should get task"() {
         given:
-            def defaultProject = projectsRepository.findOneByUserIdAndName(USER_ID, tasksProperties.getDefaultProjectName()).orElseThrow()
             def task = tasksRepository.save(TaskEntity.builder()
                     .name("test")
                     .startDay(LocalDate.now())
@@ -139,7 +149,6 @@ class TasksControllerTest extends UserInitializedSpecification {
 
     def "should return 404 when task does not exist"() {
         given:
-            def defaultProject = projectsRepository.findOneByUserIdAndName(USER_ID, tasksProperties.getDefaultProjectName()).orElseThrow()
             tasksRepository.save(TaskEntity.builder()
                     .name("test")
                     .startDay(LocalDate.now())
@@ -158,7 +167,6 @@ class TasksControllerTest extends UserInitializedSpecification {
 
     def "should update task"() {
         given:
-            def defaultProject = projectsRepository.findOneByUserIdAndName(USER_ID, tasksProperties.getDefaultProjectName()).orElseThrow()
             def task = tasksRepository.save(TaskEntity.builder()
                     .name("test")
                     .startDay(LocalDate.now())
@@ -192,7 +200,6 @@ class TasksControllerTest extends UserInitializedSpecification {
 
     def "should update task's project"() {
         given:
-            def defaultProject = projectsRepository.findOneByUserIdAndName(USER_ID, tasksProperties.getDefaultProjectName()).orElseThrow()
             def project = projectsRepository.save(ProjectEntity.builder().name("Project 1").userId(USER_ID).build())
             def task = tasksRepository.save(TaskEntity.builder()
                     .name("test")
@@ -216,7 +223,6 @@ class TasksControllerTest extends UserInitializedSpecification {
 
     def "should return error when trying to update task with invalid data"() {
         given:
-            def defaultProject = projectsRepository.findOneByUserIdAndName(USER_ID, tasksProperties.getDefaultProjectName()).orElseThrow()
             def task = tasksRepository.save(TaskEntity.builder()
                     .name("test")
                     .startDay(LocalDate.now())
@@ -254,7 +260,6 @@ class TasksControllerTest extends UserInitializedSpecification {
 
     def "should delete task"() {
         given:
-            def defaultProject = projectsRepository.findOneByUserIdAndName(USER_ID, tasksProperties.getDefaultProjectName()).orElseThrow()
             def task = tasksRepository.save(TaskEntity.builder()
                     .name("test")
                     .project(defaultProject)
@@ -269,7 +274,6 @@ class TasksControllerTest extends UserInitializedSpecification {
 
     def "should return 404 when trying to delete non-existent task"() {
         given:
-            def defaultProject = projectsRepository.findOneByUserIdAndName(USER_ID, tasksProperties.getDefaultProjectName()).orElseThrow()
             def task = tasksRepository.save(TaskEntity.builder()
                     .name("test")
                     .project(defaultProject)

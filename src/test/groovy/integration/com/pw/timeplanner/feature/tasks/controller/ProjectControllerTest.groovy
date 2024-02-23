@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -82,23 +83,25 @@ class ProjectControllerTest extends UserInitializedSpecification {
         when:
             def response = mockMvc.perform(post(ProjectsResource.RESOURCE_PATH).contentType(APPLICATION_JSON).content(json).with(userIdJwt()))
         then:
-            response.andExpect(status().isOk())
+            def createdProject = projectsRepository.findOneByUserIdAndName(USER_ID, "Project1").orElseThrow()
+            createdProject.with {
+                assert it.color == "#FF0000"
+                assert it.scheduleStartTime == LocalTime.of(8, 0)
+                assert it.scheduleEndTime == LocalTime.of(16, 0)
+                assert it.userId == USER_ID
+                assert it.name == "Project1"
+            }
+            response.andExpect(status().isCreated())
+                    .andExpect(header().string("Location", equalTo("/${createdProject.id}".toString())))
                     .andExpect(content().contentType(APPLICATION_JSON))
-                    .andExpect(jsonPath("\$.id").exists())
+                    .andExpect(jsonPath("\$.id", equalTo(createdProject.id.toString())))
                     .andExpect(jsonPath("\$.name", equalTo("Project1")))
                     .andExpect(jsonPath("\$.color", equalTo("#FF0000")))
                     .andExpect(jsonPath("\$.scheduleStartTime", equalTo("08:00")))
                     .andExpect(jsonPath("\$.scheduleEndTime", equalTo("16:00")))
-            projectsRepository.findOneByUserIdAndName(USER_ID, "Project1").with {
-                assert it.isPresent()
-                assert it.get().color == "#FF0000"
-                assert it.get().scheduleStartTime == LocalTime.of(8, 0)
-                assert it.get().scheduleEndTime == LocalTime.of(16, 0)
-                assert it.get().userId == USER_ID
-                assert it.get().name == "Project1"
-            }
+
         cleanup:
-            projectsRepository.delete(projectsRepository.findOneByUserIdAndName(USER_ID, "Project1").orElseThrow())
+            projectsRepository.delete(createdProject)
     }
 
     def "should throw when trying to create project with existing name"() {

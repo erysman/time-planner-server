@@ -8,9 +8,11 @@ import com.pw.timeplanner.feature.tasks.api.projectDto.UpdateProjectDTO;
 import com.pw.timeplanner.feature.tasks.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,9 +56,10 @@ public class ProjectController implements ProjectsResource {
     }
 
     @Override
-    public ProjectDTO createProject(JwtAuthenticationToken authentication, CreateProjectDTO createProjectDTO) {
+    public ResponseEntity<ProjectDTO> createProject(JwtAuthenticationToken authentication, CreateProjectDTO createProjectDTO) {
         String userId = getUserIdFromToken(authentication);
-        return projectService.createProject(userId, createProjectDTO);
+        ProjectDTO project = projectService.createProject(userId, createProjectDTO);
+        return ResponseEntity.created(URI.create("/"+project.getId())).body(project);
     }
 
     @Override
