@@ -1,19 +1,13 @@
 package com.pw.timeplanner.feature.tasks.service
 
-import com.pw.timeplanner.config.TasksProperties
+
 import spock.lang.Specification
 
 import java.time.LocalTime
 
 class TimeConverterTest extends Specification {
 
-    def TimeConverter timeConverter
-    def TasksProperties properties = Mock(TasksProperties)
-
-    def setup() {
-        properties.getDefaultDurationMinutes() >> 60
-        timeConverter = new TimeConverter(properties)
-    }
+    def timeConverter = new TimeConverter()
 
     def "timeToNumber method converts time to number correctly"() {
         expect:

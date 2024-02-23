@@ -13,7 +13,7 @@ import static com.pw.timeplanner.core.AuthUtils.getUserIdFromToken;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class UserController implements UserResource {
+class UserController implements UserResource {
 
     private final UserService service;
 

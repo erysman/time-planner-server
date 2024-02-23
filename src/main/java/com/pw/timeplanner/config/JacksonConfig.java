@@ -9,7 +9,7 @@ import org.zalando.problem.jackson.ProblemModule;
 import org.zalando.problem.violations.ConstraintViolationProblemModule;
 
 @Configuration
-public class JacksonConfig {
+class JacksonConfig {
 
     @Bean
     Jackson2ObjectMapperBuilder objectMapperBuilder() {

@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 @Slf4j
-abstract public class TasksOrderService<T> {
+abstract class TasksOrderService<T> {
 
-    abstract public List<UUID> getOrder(String userId, T param);
+    abstract List<UUID> getOrder(String userId, T param);
 
-    abstract public List<UUID> reorder(String userId, T param, List<UUID> newTasksOrder);
+    abstract List<UUID> reorder(String userId, T param, List<UUID> newTasksOrder);
 
     @Transactional
     protected List<UUID> reorder(Set<TaskEntity> tasksWithOrder, List<UUID> newTasksOrder, BiConsumer<TaskEntity,
@@ -69,8 +69,8 @@ abstract public class TasksOrderService<T> {
                 .collect(Collectors.toSet());
     }
 
-    abstract public void setOrder(String userId, TaskEntity taskEntity);
+    abstract void setOrder(String userId, TaskEntity taskEntity);
 
-    abstract public void unsetOrder(String userId, TaskEntity taskEntity);
+    abstract void unsetOrder(String userId, TaskEntity taskEntity);
 }
 

@@ -19,7 +19,7 @@ import static com.pw.timeplanner.core.AuthUtils.getUserIdFromToken;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class TasksController implements TasksResource {
+class TasksController implements TasksResource {
 
     private final TasksService tasksService;
 

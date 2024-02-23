@@ -5,6 +5,6 @@ import org.zalando.problem.spring.web.advice.ProblemHandling;
 import org.zalando.problem.spring.web.advice.security.SecurityAdviceTrait;
 
 @ControllerAdvice
-public class ControllerAdviceHandler implements ProblemHandling, SecurityAdviceTrait {
+class ControllerAdviceHandler implements ProblemHandling, SecurityAdviceTrait {
 
 }

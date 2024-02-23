@@ -21,7 +21,7 @@ import static com.pw.timeplanner.core.AuthUtils.getUserIdFromToken;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class DayTasksController implements DayTasksResource {
+class DayTasksController implements DayTasksResource {
 
     private final TasksService tasksService;
     private final TasksDayOrderService tasksOrderService;

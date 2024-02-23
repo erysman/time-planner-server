@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @Configuration
-public class ValidationConfig {
+class ValidationConfig {
 
     @Bean
-    public Validator defaultValidator() {
+    Validator defaultValidator() {
         return new LocalValidatorFactoryBean();
     }
 }

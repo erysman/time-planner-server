@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConf
 
 @SpringBootApplication(exclude = ErrorMvcAutoConfiguration.class)
 
-public class TimePlannerApplication {
+class TimePlannerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TimePlannerApplication.class, args);

@@ -21,7 +21,7 @@ import static com.pw.timeplanner.core.AuthUtils.getUserIdFromToken;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class ProjectController implements ProjectsResource {
+class ProjectController implements ProjectsResource {
 
     private final ProjectService projectService;
 

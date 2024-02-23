@@ -10,9 +10,9 @@ import java.time.Duration;
 
 @Configuration
 @AllArgsConstructor
-public class SchedulerClientConfig {
+class SchedulerClientConfig {
 
-    private SchedulerClientProperties properties;
+    private final SchedulerClientProperties properties;
 
     @Bean
     RestClient client(RestTemplateBuilder restTemplateBuilder) {

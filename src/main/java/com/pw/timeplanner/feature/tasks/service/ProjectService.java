@@ -24,12 +24,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.pw.timeplanner.config.Constants.LOCAL_TIME_MAX;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ProjectService {
+
+    public static final LocalTime SCHEDULE_END_TIME = LocalTime.of(23, 59, 59);
 
     private final ProjectsRepository projectsRepository;
     private final ProjectEntityMapper mapper;
@@ -71,7 +71,7 @@ public class ProjectService {
                 .userId(userId)
                 .color(properties.getDefaultProjectColor())
                 .scheduleStartTime(LocalTime.MIN)
-                .scheduleEndTime(LOCAL_TIME_MAX)
+                .scheduleEndTime(SCHEDULE_END_TIME)
                 .build();
         log.info("Creating default project named '{}' for user: {}", properties.getDefaultProjectName(), userId);
         return projectsRepository.save(defaultProject);
@@ -114,7 +114,7 @@ public class ProjectService {
             entity.setScheduleStartTime(LocalTime.MIN);
         }
         if(entity.getScheduleEndTime() == null) {
-            entity.setScheduleEndTime(LOCAL_TIME_MAX);
+            entity.setScheduleEndTime(SCHEDULE_END_TIME);
         }
         try {
             return mapper.toDTO(projectsRepository.save(entity));

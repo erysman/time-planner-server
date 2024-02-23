@@ -20,8 +20,8 @@ import java.util.List;
 @Slf4j
 public class SchedulingServerClient {
 
-    private RestClient client;
-    private ObjectMapper mapper;
+    private final RestClient client;
+    private final ObjectMapper mapper;
 
     public ScheduleTasksResponse scheduleTasks(List<Task> tasks, List<Project> projects, List<BannedRange> bannedRanges) {
         log.info("Triggering external schedule service with tasks {}, projects {} and bannedRanges {}", tasks, projects, bannedRanges);

@@ -41,7 +41,7 @@ public class TasksDayOrderService extends TasksOrderService<LocalDate> {
 
     @Transactional
     @Override
-    public void setOrder(String userId, TaskEntity taskEntity) {
+    void setOrder(String userId, TaskEntity taskEntity) {
         if (taskEntity.getStartDay() != null && taskEntity.getStartTime() == null) {
             this.setOrder(userId, taskEntity, taskEntity.getStartDay());
         }
@@ -55,7 +55,7 @@ public class TasksDayOrderService extends TasksOrderService<LocalDate> {
 
     @Transactional
     @Override
-    public void unsetOrder(String userId, TaskEntity taskEntity) {
+    void unsetOrder(String userId, TaskEntity taskEntity) {
         if (hasDayOrder(taskEntity)) {
             tasksRepository.shiftDayOrderOfAllTasksAfterDeletedOne(userId, taskEntity.getStartDay(),
                     taskEntity.getDayOrder());
@@ -72,7 +72,7 @@ public class TasksDayOrderService extends TasksOrderService<LocalDate> {
      * @param day
      */
     @Transactional
-    public void updateOrder(String userId, LocalDate day) {
+    void updateOrder(String userId, LocalDate day) {
         List<TaskEntity> taskEntities = tasksRepository.findAndLockAllByUserIdAndStartDayAndStartTimeIsNull(userId,
                 day);
         List<TaskEntity> entitiesWithDayOrder = taskEntities.stream()
@@ -99,7 +99,7 @@ public class TasksDayOrderService extends TasksOrderService<LocalDate> {
     }
 
     @Transactional
-    public void updateOrder(String userId, TaskEntity task, JsonNullable<LocalDate> updateStartDay,
+    void updateOrder(String userId, TaskEntity task, JsonNullable<LocalDate> updateStartDay,
                             JsonNullable<LocalTime> updateStartTime) {
         LocalDate startDay = task.getStartDay();
         LocalTime startTime = task.getStartTime();

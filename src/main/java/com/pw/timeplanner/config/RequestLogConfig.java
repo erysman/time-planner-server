@@ -8,10 +8,10 @@ import static org.zalando.logbook.core.Conditions.exclude;
 import static org.zalando.logbook.core.Conditions.requestTo;
 
 @Configuration
-public class RequestLogConfig {
+class RequestLogConfig {
 
     @Bean
-    public Logbook logbook() {
+    Logbook logbook() {
         return Logbook.builder()
                 .condition(exclude(
                         requestTo("/actuator/health"),

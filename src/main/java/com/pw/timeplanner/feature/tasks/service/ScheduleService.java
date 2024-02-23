@@ -39,11 +39,12 @@ public class ScheduleService {
         int autoScheduledTasksCount = tasksRepository.countAutoScheduledTasks(userId, day);
         return new ScheduleInfoDTO(autoScheduledTasksCount > 0);
     }
+
     @Transactional
     public void schedule(String userId, LocalDate day) {
         log.info("Scheduling tasks for user: " + userId + " and day: " + day);
         List<TaskEntity> taskEntities = tasksRepository.findAndLockAllByUserIdAndStartDayWithProjects(userId, day);
-        if(taskEntities.isEmpty()) {
+        if (taskEntities.isEmpty()) {
             return;
         }
         List<ProjectEntity> projectEntities = taskEntities.stream()
@@ -63,14 +64,17 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void updateScheduledTasks(LocalDate day, String userId, ScheduleTasksResponse scheduledTasksResponse, List<TaskEntity> taskEntities) {
+    public void updateScheduledTasks(LocalDate day, String userId, ScheduleTasksResponse scheduledTasksResponse,
+                                     List<TaskEntity> taskEntities) {
         List<ScheduledTask> scheduledTasks = scheduledTasksResponse.getScheduledTasks();
         UUID runId = scheduledTasksResponse.getRunId();
 
         taskEntities.stream()
                 .filter(taskEntity -> taskEntity.getStartTime() == null)
                 .forEach(taskEntity -> {
-                    scheduledTasks.stream().filter(scheduledTask -> scheduledTask.getId().equals(taskEntity.getId()))
+                    scheduledTasks.stream()
+                            .filter(scheduledTask -> scheduledTask.getId()
+                                    .equals(taskEntity.getId()))
                             .findFirst()
                             .ifPresent(scheduledTask -> {
                                 taskEntity.setAutoScheduled(true);

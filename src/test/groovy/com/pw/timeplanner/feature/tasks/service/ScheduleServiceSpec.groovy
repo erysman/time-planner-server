@@ -15,7 +15,7 @@ import java.time.LocalTime
 
 class ScheduleServiceSpec extends Specification {
 
-    TimeConverter timeConverter = new TimeConverter(properties)
+    TimeConverter timeConverter = new TimeConverter()
     def orderService = Mock(TasksDayOrderService)
     def tasksRepository = Mock(TasksRepository)
     def bannedRangesService = Mock(BannedRangesService)

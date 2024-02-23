@@ -18,7 +18,7 @@ import static com.pw.timeplanner.core.AuthUtils.getUserIdFromToken;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class BannedRangesController implements BannedRangesResource {
+class BannedRangesController implements BannedRangesResource {
 
     private final BannedRangesService service;
     @Override

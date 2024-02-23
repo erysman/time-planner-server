@@ -81,7 +81,8 @@ management:
 #        timeplanner:
 #          config:
 #            RequestLoggingFilter: DEBUG
-
+datasource-batch-logging:
+  enabled: false
 logging:
   level:
     org:

@@ -17,13 +17,13 @@ import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 @EnableWebSecurity
 @Profile({"!test"})
 @Import(SecurityProblemSupport.class)
-public class SecurityConfig  {
+class SecurityConfig {
 
     @Autowired
     private SecurityProblemSupport problemSupport;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers("/actuator/**")

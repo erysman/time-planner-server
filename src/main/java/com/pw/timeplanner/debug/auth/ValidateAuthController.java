@@ -5,13 +5,11 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
-
 @RestController
 @Slf4j
-public class ValidateAuthController {
+class ValidateAuthController {
     @GetMapping("/validateAuth")
-    public boolean validate(JwtAuthenticationToken authentication) {
+    boolean validate(JwtAuthenticationToken authentication) {
         String userId = authentication.getToken().getClaim("user_id");
         log.info("Valid token with userId: "+userId);
         return true;

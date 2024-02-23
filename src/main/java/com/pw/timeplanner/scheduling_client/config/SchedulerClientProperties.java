@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "client.scheduler")
 @Data
-public class SchedulerClientProperties {
+class SchedulerClientProperties {
     String baseUrl;
     Integer connectionTimeout;
 
