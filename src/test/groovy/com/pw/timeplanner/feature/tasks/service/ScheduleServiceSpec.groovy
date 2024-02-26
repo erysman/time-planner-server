@@ -1,10 +1,13 @@
 package com.pw.timeplanner.feature.tasks.service
 
 import com.pw.timeplanner.config.TasksProperties
-import com.pw.timeplanner.feature.banned_ranges.service.BannedRangesService
-import com.pw.timeplanner.feature.tasks.entity.ProjectEntity
-import com.pw.timeplanner.feature.tasks.entity.TaskEntity
-import com.pw.timeplanner.feature.tasks.repository.TasksRepository
+import com.pw.timeplanner.feature.banned_ranges.BannedRangesService
+import com.pw.timeplanner.feature.projects.Project
+import com.pw.timeplanner.feature.tasks.ScheduleService
+import com.pw.timeplanner.feature.tasks.Task
+import com.pw.timeplanner.feature.tasks.TasksDayOrderService
+import com.pw.timeplanner.feature.tasks.TasksRepository
+import com.pw.timeplanner.feature.tasks.TimeConverter
 import com.pw.timeplanner.scheduling_client.SchedulingServerClient
 import com.pw.timeplanner.scheduling_client.model.ScheduleTasksResponse
 import com.pw.timeplanner.scheduling_client.model.ScheduledTask
@@ -30,9 +33,9 @@ class ScheduleServiceSpec extends Specification {
     def "schedule method schedules tasks correctly"() {
         given: "tasks and projects"
             def runId = UUID.randomUUID()
-            def project1 = ProjectEntity.builder().id(UUID.randomUUID()).name("Project 1").build()
-            def task1 = TaskEntity.builder().id(UUID.randomUUID()).name("Task 1").dayOrder(0).userId(userId).project(project1).build()
-            def task2 = TaskEntity.builder().id(UUID.randomUUID()).name("Task 2").dayOrder(1).userId(userId).project(project1).build()
+            def project1 = Project.builder().id(UUID.randomUUID()).name("Project 1").build()
+            def task1 = Task.builder().id(UUID.randomUUID()).name("Task 1").dayOrder(0).userId(userId).projectId(project1).build()
+            def task2 = Task.builder().id(UUID.randomUUID()).name("Task 2").dayOrder(1).userId(userId).projectId(project1).build()
             def scheduledTask1 = ScheduledTask.builder().id(task1.id).startTime(9.0).build()
             def mockResponse = ScheduleTasksResponse.builder().scheduledTasks([scheduledTask1]).runId(runId).build()
         and: "mocking repository and client interactions"
@@ -65,15 +68,15 @@ class ScheduleServiceSpec extends Specification {
     def "revokeSchedule method modifies autoScheduled tasks"() {
         given: "tasks and projects"
             def runId = UUID.randomUUID()
-            def project1 = ProjectEntity.builder().id(UUID.randomUUID()).name("Project 1").build()
-            def task1 = TaskEntity.builder().id(UUID.randomUUID()).name("Task 1")
-                    .startDay(day).startTime(LocalTime.of(9, 0, 0))
-                    .autoScheduled(true).scheduleRunId(runId).durationMin(defaultDurationMin)
-                    .userId(userId).project(project1).build()
-            def task2 = TaskEntity.builder().id(UUID.randomUUID()).name("Task 2")
-                    .startDay(day).startTime(LocalTime.of(10, 0, 0))
-                    .autoScheduled(false).durationMin(defaultDurationMin)
-                    .userId(userId).project(project1).build()
+            def project1 = Project.builder().id(UUID.randomUUID()).name("Project 1").build()
+            def task1 = Task.builder().id(UUID.randomUUID()).name("Task 1")
+                            .startDay(day).startTime(LocalTime.of(9, 0, 0))
+                            .autoScheduled(true).scheduleRunId(runId).durationMin(defaultDurationMin)
+                            .userId(userId).projectId(project1).build()
+            def task2 = Task.builder().id(UUID.randomUUID()).name("Task 2")
+                            .startDay(day).startTime(LocalTime.of(10, 0, 0))
+                            .autoScheduled(false).durationMin(defaultDurationMin)
+                            .userId(userId).projectId(project1).build()
         and: "mocking repository and client interactions"
             tasksRepository.findAndLockAllByUserIdAndStartDay(userId, day) >> [task1, task2]
         when: "schedule method is called"

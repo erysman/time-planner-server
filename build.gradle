@@ -19,6 +19,9 @@ configurations {
 		extendsFrom annotationProcessor
 	}
 	compile.exclude module: 'spring-boot-starter-tomcat'
+	integrationImplementation.extendsFrom testImplementation
+	integrationRuntime.extendsFrom testRuntime
+	integrationRuntimeOnly.extendsFrom testRuntimeOnly
 }
 repositories {
 	mavenCentral()
@@ -69,6 +72,26 @@ dependencies {
 	testRuntimeOnly "org.objenesis:objenesis:3.3"
 	runtimeOnly 'com.mysql:mysql-connector-j'
 }
+
+sourceSets {
+	integration {
+		groovy {
+		}
+		resources {
+		}
+		compileClasspath += main.output + test.output
+		runtimeClasspath += main.output + test.output
+	}
+}
+
+tasks.register('integrationTest', Test) {
+	group = 'verification'
+    testClassesDirs = sourceSets.integration.output.classesDirs
+    classpath = sourceSets.integration.runtimeClasspath
+	useJUnitPlatform()
+}
+check.dependsOn(test, integrationTest)
+
 
 bootRun {
 	jvmArgs(['-Xmx2048m', '-XX:TieredStopAtLevel=4'])

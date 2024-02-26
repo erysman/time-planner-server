@@ -3,15 +3,19 @@ package com.pw.timeplanner.feature.tasks.service
 import com.pw.timeplanner.config.TasksProperties
 import com.pw.timeplanner.core.entity.JsonNullableMapperImpl
 import com.pw.timeplanner.core.exception.ResourceNotFoundException
+import com.pw.timeplanner.feature.projects.Project
+import com.pw.timeplanner.feature.projects.ProjectService
+import com.pw.timeplanner.feature.tasks.Task
+import com.pw.timeplanner.feature.tasks.TaskEntityMapper
+import com.pw.timeplanner.feature.tasks.TasksDayOrderService
+import com.pw.timeplanner.feature.tasks.TasksProjectOrderService
+import com.pw.timeplanner.feature.tasks.TasksRepository
+import com.pw.timeplanner.feature.tasks.TasksService
+import com.pw.timeplanner.feature.tasks.TasksValidator
 import com.pw.timeplanner.feature.tasks.api.dto.CreateTaskDTO
 import com.pw.timeplanner.feature.tasks.api.dto.TaskDTO
 import com.pw.timeplanner.feature.tasks.api.dto.UpdateTaskDTO
-import com.pw.timeplanner.feature.tasks.entity.ProjectEntity
-import com.pw.timeplanner.feature.tasks.entity.TaskEntity
-import com.pw.timeplanner.feature.tasks.entity.TaskEntityMapper
 import com.pw.timeplanner.feature.tasks.entity.TaskEntityMapperImpl
-import com.pw.timeplanner.feature.tasks.repository.TasksRepository
-import com.pw.timeplanner.feature.tasks.service.validator.TasksValidator
 import org.openapitools.jackson.nullable.JsonNullable
 import spock.lang.Specification
 
@@ -33,7 +37,7 @@ class TasksServiceSpec extends Specification {
     def "should create task with projectId"() {
         given:
             def projectId = UUID.randomUUID()
-            def project = ProjectEntity.builder().id(projectId).name("Project 1").build()
+            def project = Project.builder().id(projectId).name("Project 1").build()
             def taskDto = CreateTaskDTO.builder()
                     .name("Task 1")
                     .projectId(projectId)
@@ -46,16 +50,16 @@ class TasksServiceSpec extends Specification {
         then:
             1 * tasksValidator.validate(taskDto)
             1 * projectsService.getProjectEntity(userId, projectId) >> project
-            1 * tasksRepository.save(_ as TaskEntity) >> { TaskEntity taskEntity -> taskEntity }
-            1 * tasksDayOrderService.setOrder(userId, _ as TaskEntity)
-            1 * tasksProjectOrderService.setOrder(userId, _ as TaskEntity)
+            1 * tasksRepository.save(_ as Task) >> { Task taskEntity -> taskEntity }
+            1 * tasksDayOrderService.setOrder(userId, _ as Task)
+            1 * tasksProjectOrderService.setOrder(userId, _ as Task)
             assertCreateTaskDTO(createdTaskDTO, taskDto, projectId)
     }
 
     def "should create task with default project"() {
         given:
             def defaultProjectName = "Default Project"
-            def defaultProject = ProjectEntity.builder().id(UUID.randomUUID()).name(defaultProjectName).build()
+            def defaultProject = Project.builder().id(UUID.randomUUID()).name(defaultProjectName).build()
             properties.getDefaultProjectName() >> defaultProjectName
             def taskDto = CreateTaskDTO.builder()
                     .name("Task 1")
@@ -68,9 +72,9 @@ class TasksServiceSpec extends Specification {
         then:
             1 * tasksValidator.validate(taskDto)
             1 * projectsService.getOrCreateDefaultProjectEntity(userId) >> defaultProject
-            1 * tasksRepository.save(_ as TaskEntity) >> { TaskEntity taskEntity -> taskEntity }
-            1 * tasksDayOrderService.setOrder(userId, _ as TaskEntity)
-            1 * tasksProjectOrderService.setOrder(userId, _ as TaskEntity)
+            1 * tasksRepository.save(_ as Task) >> { Task taskEntity -> taskEntity }
+            1 * tasksDayOrderService.setOrder(userId, _ as Task)
+            1 * tasksProjectOrderService.setOrder(userId, _ as Task)
             assertCreateTaskDTO(createdTaskDTO, taskDto, defaultProject.id)
     }
 
@@ -87,7 +91,7 @@ class TasksServiceSpec extends Specification {
     def "should delete task"() {
         given:
             def taskId = UUID.randomUUID()
-            def taskEntity = TaskEntity.builder().id(taskId).userId(userId).build()
+            def taskEntity = Task.builder().id(taskId).userId(userId).build()
         when:
             tasksService.deleteTask(userId, taskId)
         then:
@@ -113,8 +117,8 @@ class TasksServiceSpec extends Specification {
     def "should update task's name"() {
         given:
             def taskId = UUID.randomUUID()
-            def project = ProjectEntity.builder().id(UUID.randomUUID()).name("Project 1").build()
-            def taskEntity = TaskEntity.builder().id(taskId).userId(userId).project(project).build()
+            def project = Project.builder().id(UUID.randomUUID()).name("Project 1").build()
+            def taskEntity = Task.builder().id(taskId).userId(userId).projectId(project).build()
             def updateTaskDto = UpdateTaskDTO.builder()
                     .name("Task 1")
                     .build()
@@ -144,9 +148,9 @@ class TasksServiceSpec extends Specification {
         given:
             def taskId = UUID.randomUUID()
             def newProjectId = UUID.randomUUID()
-            def newProject = ProjectEntity.builder().id(newProjectId).name("Project 2").build()
-            def project = ProjectEntity.builder().id(UUID.randomUUID()).name("Project 1").build()
-            def taskEntity = TaskEntity.builder().id(taskId).userId(userId).project(project).build()
+            def newProject = Project.builder().id(newProjectId).name("Project 2").build()
+            def project = Project.builder().id(UUID.randomUUID()).name("Project 1").build()
+            def taskEntity = Task.builder().id(taskId).userId(userId).projectId(project).build()
             def updateTaskDto = UpdateTaskDTO.builder()
                     .projectId(newProjectId)
                     .build()
@@ -157,15 +161,15 @@ class TasksServiceSpec extends Specification {
             1 * tasksValidator.validate(updateTaskDto)
             1 * tasksProjectOrderService.updateOrder(userId, taskEntity, newProject)
             1 * projectsService.getProjectEntity(userId, newProjectId) >> newProject
-            taskEntity.project == newProject
+            taskEntity.projectId == newProject
             updatedTaskDTO.projectId == newProjectId
     }
 
     def "should update task's startDay"() {
         given:
             def taskId = UUID.randomUUID()
-            def project = ProjectEntity.builder().id(UUID.randomUUID()).name("Project 1").build()
-            def taskEntity = TaskEntity.builder().id(taskId).userId(userId).project(project).build()
+            def project = Project.builder().id(UUID.randomUUID()).name("Project 1").build()
+            def taskEntity = Task.builder().id(taskId).userId(userId).projectId(project).build()
             def newStartDay = JsonNullable.of(LocalDate.now().plusDays(1))
             def updateTaskDto = UpdateTaskDTO.builder()
                     .startDay(newStartDay)
@@ -188,8 +192,8 @@ class TasksServiceSpec extends Specification {
     def "should update task's startTime"() {
         given:
             def taskId = UUID.randomUUID()
-            def project = ProjectEntity.builder().id(UUID.randomUUID()).name("Project 1").build()
-            def taskEntity = TaskEntity.builder().id(taskId).userId(userId).project(project).build()
+            def project = Project.builder().id(UUID.randomUUID()).name("Project 1").build()
+            def taskEntity = Task.builder().id(taskId).userId(userId).projectId(project).build()
             def newStartTime = JsonNullable.of(LocalTime.of(10, 0))
             def updateTaskDto = UpdateTaskDTO.builder()
                     .startTime(newStartTime)

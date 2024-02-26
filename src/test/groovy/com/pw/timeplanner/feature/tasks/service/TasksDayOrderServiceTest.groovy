@@ -1,9 +1,9 @@
 package com.pw.timeplanner.feature.tasks.service
 
-
-import com.pw.timeplanner.feature.tasks.entity.TaskEntity
-import com.pw.timeplanner.feature.tasks.repository.TasksRepository
-import com.pw.timeplanner.feature.tasks.service.exceptions.ListOrderException
+import com.pw.timeplanner.feature.tasks.Task
+import com.pw.timeplanner.feature.tasks.TasksDayOrderService
+import com.pw.timeplanner.feature.tasks.TasksRepository
+import com.pw.timeplanner.feature.tasks.exceptions.ListOrderException
 import org.openapitools.jackson.nullable.JsonNullable
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -21,9 +21,9 @@ class TasksDayOrderServiceTest extends Specification {
 
     def "should change order of tasks"() {
         given:
-            def task0 = TaskEntity.builder().id(UUID.randomUUID()).dayOrder(0).build()
-            def task1 = TaskEntity.builder().id(UUID.randomUUID()).dayOrder(1).build()
-            def task2 = TaskEntity.builder().id(UUID.randomUUID()).dayOrder(2).build()
+            def task0 = Task.builder().id(UUID.randomUUID()).dayOrder(0).build()
+            def task1 = Task.builder().id(UUID.randomUUID()).dayOrder(1).build()
+            def task2 = Task.builder().id(UUID.randomUUID()).dayOrder(2).build()
             def tasks = [task0, task1, task2]
             def newOrder = [task1.id, task2.id, task0.id]
         when:
@@ -38,9 +38,9 @@ class TasksDayOrderServiceTest extends Specification {
 
     def "should throw ListOrderException when given order contains wrong ids"() {
         given:
-            def task0 = TaskEntity.builder().id(taskIds[0]).dayOrder(0).build()
-            def task1 = TaskEntity.builder().id(taskIds[1]).dayOrder(1).build()
-            def task2 = TaskEntity.builder().id(taskIds[2]).dayOrder(2).build()
+            def task0 = Task.builder().id(taskIds[0]).dayOrder(0).build()
+            def task1 = Task.builder().id(taskIds[1]).dayOrder(1).build()
+            def task2 = Task.builder().id(taskIds[2]).dayOrder(2).build()
             def tasks = [task0, task1, task2]
         when:
             service.reorder(userId, day, newOrder)
@@ -56,7 +56,7 @@ class TasksDayOrderServiceTest extends Specification {
 
     def "should set order for project and startDay"() {
         given:
-            def taskEntity = TaskEntity.builder().id(UUID.randomUUID()).startDay(day).userId(userId).build()
+            def taskEntity = Task.builder().id(UUID.randomUUID()).startDay(day).userId(userId).build()
         when:
             service.setOrder(userId, taskEntity)
         then:
@@ -68,7 +68,7 @@ class TasksDayOrderServiceTest extends Specification {
 
     def "should not set order for startDay, when startTime is present"() {
         given:
-            def taskEntity = TaskEntity.builder().id(UUID.randomUUID()).startDay(startDay).startTime(startTime).build()
+            def taskEntity = Task.builder().id(UUID.randomUUID()).startDay(startDay).startTime(startTime).build()
         when:
             service.setOrder(userId, taskEntity)
         then:
@@ -82,7 +82,7 @@ class TasksDayOrderServiceTest extends Specification {
     def "should unset day order if entity has it"() {
         given:
             def dayOrder = 5
-            def taskEntity = TaskEntity.builder().id(UUID.randomUUID()).startDay(day).dayOrder(dayOrder).build()
+            def taskEntity = Task.builder().id(UUID.randomUUID()).startDay(day).dayOrder(dayOrder).build()
         when:
             service.unsetOrder(userId, taskEntity)
         then:
@@ -93,7 +93,7 @@ class TasksDayOrderServiceTest extends Specification {
     def "should not unset day order"() {
         given:
             def dayOrder = 5
-            def taskEntity = TaskEntity.builder().id(UUID.randomUUID()).startDay(day).dayOrder(dayOrder).build()
+            def taskEntity = Task.builder().id(UUID.randomUUID()).startDay(day).dayOrder(dayOrder).build()
         when:
             service.unsetOrder(userId, taskEntity)
         then:
@@ -122,8 +122,8 @@ class TasksDayOrderServiceTest extends Specification {
     def "should set task's day order for the same day when updating time"() {
         given:
             tasksRepository.findLastDayOrder(userId, day) >> Optional.empty()
-            def task = TaskEntity.builder().id(UUID.randomUUID()).startDay(day)
-                    .startTime(existingStartTime).dayOrder(existingDayOrder).build()
+            def task = Task.builder().id(UUID.randomUUID()).startDay(day)
+                           .startTime(existingStartTime).dayOrder(existingDayOrder).build()
         when:
             service.updateOrder(userId, task, JsonNullable.of(day), updateStartTime)
         then:
@@ -143,7 +143,7 @@ class TasksDayOrderServiceTest extends Specification {
         given:
             tasksRepository.findLastDayOrder(userId, day) >> Optional.empty()
             tasksRepository.findLastDayOrder(userId, day.plusDays(1)) >> Optional.of(1)
-            def task = TaskEntity.builder().id(UUID.randomUUID()).startDay(day).startTime(null).dayOrder(existingOrder).build()
+            def task = Task.builder().id(UUID.randomUUID()).startDay(day).startTime(null).dayOrder(existingOrder).build()
         when:
             service.updateOrder(userId, task, updateStartDay, updateStartTime)
         then:
@@ -164,7 +164,7 @@ class TasksDayOrderServiceTest extends Specification {
         given:
             tasksRepository.findLastDayOrder(userId, day) >> Optional.empty()
             tasksRepository.findLastDayOrder(userId, day.plusDays(1)) >> Optional.of(1)
-            def task = TaskEntity.builder().id(UUID.randomUUID()).startDay(existingDay).startTime(existingStartTime).dayOrder(existingOrder).build()
+            def task = Task.builder().id(UUID.randomUUID()).startDay(existingDay).startTime(existingStartTime).dayOrder(existingOrder).build()
         when:
             service.updateOrder(userId, task, updateStartDay, updateStartTime)
         then:
@@ -184,11 +184,11 @@ class TasksDayOrderServiceTest extends Specification {
             null          | null        | LocalTime.now()   | JsonNullable.of(day.plusDays(1)) | JsonNullable.of(null)            | 2
     }
 
-    private static TaskEntity buildOrderTask(Integer dayOrder = null) {
-        TaskEntity.builder().id(UUID.randomUUID()).startDay(day).dayOrder(dayOrder).build()
+    private static Task buildOrderTask(Integer dayOrder = null) {
+        Task.builder().id(UUID.randomUUID()).startDay(day).dayOrder(dayOrder).build()
     }
 
-    private static TaskEntity buildTimeTask(LocalTime startTime = LocalTime.now()) {
-        TaskEntity.builder().id(UUID.randomUUID()).startDay(day).dayOrder(null).startTime(startTime).build()
+    private static Task buildTimeTask(LocalTime startTime = LocalTime.now()) {
+        Task.builder().id(UUID.randomUUID()).startDay(day).dayOrder(null).startTime(startTime).build()
     }
 }

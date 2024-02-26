@@ -1,7 +1,7 @@
 package com.pw.timeplanner.feature.user.service;
 
-import com.pw.timeplanner.feature.tasks.api.projectDto.ProjectDTO;
-import com.pw.timeplanner.feature.tasks.service.ProjectService;
+import com.pw.timeplanner.feature.projects.ProjectService;
+import com.pw.timeplanner.feature.projects.dto.ProjectDTO;
 import com.pw.timeplanner.feature.user.api.UserInfoDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

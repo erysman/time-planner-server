@@ -1,6 +1,6 @@
 package com.pw.timeplanner.feature.tasks.service
 
-
+import com.pw.timeplanner.feature.tasks.TimeConverter
 import spock.lang.Specification
 
 import java.time.LocalTime

@@ -1,9 +1,10 @@
 package com.pw.timeplanner.feature.tasks.service
 
-import com.pw.timeplanner.feature.tasks.entity.ProjectEntity
-import com.pw.timeplanner.feature.tasks.entity.TaskEntity
-import com.pw.timeplanner.feature.tasks.repository.TasksRepository
-import com.pw.timeplanner.feature.tasks.service.exceptions.ListOrderException
+import com.pw.timeplanner.feature.projects.Project
+import com.pw.timeplanner.feature.tasks.Task
+import com.pw.timeplanner.feature.tasks.TasksProjectOrderService
+import com.pw.timeplanner.feature.tasks.TasksRepository
+import com.pw.timeplanner.feature.tasks.exceptions.ListOrderException
 import spock.lang.Specification
 
 class TasksProjectOrderServiceTest extends Specification {
@@ -15,10 +16,10 @@ class TasksProjectOrderServiceTest extends Specification {
 
     def "should change order of tasks"() {
         given:
-            def project = ProjectEntity.builder().id(UUID.randomUUID()).name("Project 1").userId(userId).build()
-            def task0 = TaskEntity.builder().id(UUID.randomUUID()).projectOrder(0).project(project).build()
-            def task1 = TaskEntity.builder().id(UUID.randomUUID()).projectOrder(1).project(project).build()
-            def task2 = TaskEntity.builder().id(UUID.randomUUID()).projectOrder(2).project(project).build()
+            def project = Project.builder().id(UUID.randomUUID()).name("Project 1").userId(userId).build()
+            def task0 = Task.builder().id(UUID.randomUUID()).projectOrder(0).projectId(project).build()
+            def task1 = Task.builder().id(UUID.randomUUID()).projectOrder(1).projectId(project).build()
+            def task2 = Task.builder().id(UUID.randomUUID()).projectOrder(2).projectId(project).build()
             def tasks = [task0, task1, task2]
             def newOrder = [task1.id, task2.id, task0.id]
         when:
@@ -33,10 +34,10 @@ class TasksProjectOrderServiceTest extends Specification {
 
     def "should throw ListOrderException when given order contains wrong ids"() {
         given:
-            def project = ProjectEntity.builder().id(UUID.randomUUID()).name("Project 1").userId(userId).build()
-            def task0 = TaskEntity.builder().id(taskIds[0]).projectOrder(0).project(project).build()
-            def task1 = TaskEntity.builder().id(taskIds[1]).projectOrder(1).project(project).build()
-            def task2 = TaskEntity.builder().id(taskIds[2]).projectOrder(2).project(project).build()
+            def project = Project.builder().id(UUID.randomUUID()).name("Project 1").userId(userId).build()
+            def task0 = Task.builder().id(taskIds[0]).projectOrder(0).projectId(project).build()
+            def task1 = Task.builder().id(taskIds[1]).projectOrder(1).projectId(project).build()
+            def task2 = Task.builder().id(taskIds[2]).projectOrder(2).projectId(project).build()
             def tasks = [task0, task1, task2]
         when:
             service.reorder(userId, project, newOrder)
@@ -52,8 +53,8 @@ class TasksProjectOrderServiceTest extends Specification {
 
     def "should set order for project"() {
         given:
-            def project = ProjectEntity.builder().id(UUID.randomUUID()).name("Project 1").userId(userId).build()
-            def taskEntity = TaskEntity.builder().id(UUID.randomUUID()).project(project).userId(userId).build()
+            def project = Project.builder().id(UUID.randomUUID()).name("Project 1").userId(userId).build()
+            def taskEntity = Task.builder().id(UUID.randomUUID()).projectId(project).userId(userId).build()
         when:
             service.setOrder(userId, taskEntity)
         then:
@@ -65,9 +66,9 @@ class TasksProjectOrderServiceTest extends Specification {
 
     def "should set task's project order and shift order in previous project when updating task's project"() {
         given:
-            def defaultProject = ProjectEntity.builder().id(UUID.randomUUID()).userId(userId).name("inbox").build()
-            def project = ProjectEntity.builder().id(UUID.randomUUID()).userId(userId).name("Project 1").build()
-            def task = TaskEntity.builder().id(UUID.randomUUID()).name("Task").project(defaultProject).projectOrder(0).build()
+            def defaultProject = Project.builder().id(UUID.randomUUID()).userId(userId).name("inbox").build()
+            def project = Project.builder().id(UUID.randomUUID()).userId(userId).name("Project 1").build()
+            def task = Task.builder().id(UUID.randomUUID()).name("Task").projectId(defaultProject).projectOrder(0).build()
             tasksRepository.findLastProjectOrder(userId, project) >> Optional.of(8)
         when:
             service.updateOrder(userId, task, project)
@@ -78,8 +79,8 @@ class TasksProjectOrderServiceTest extends Specification {
 
     def "should not change task's project order when updating task's project to previous one"() {
         given:
-            def defaultProject = ProjectEntity.builder().id(UUID.randomUUID()).userId(userId).name("inbox").build()
-            def task = TaskEntity.builder().id(UUID.randomUUID()).name("Task").project(defaultProject).projectOrder(8).build()
+            def defaultProject = Project.builder().id(UUID.randomUUID()).userId(userId).name("inbox").build()
+            def task = Task.builder().id(UUID.randomUUID()).name("Task").projectId(defaultProject).projectOrder(8).build()
             tasksRepository.findLastProjectOrder(userId, defaultProject) >> Optional.of(8)
         when:
             service.updateOrder(userId, task, defaultProject)
