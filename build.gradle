@@ -78,6 +78,11 @@ jib {
 	to {
 		image = "europe-central2-docker.pkg.dev/time-planner-dc611/time-planner-server/time-planner"
 	}
+	container {
+		environment = [
+			"SPRING_PROFILES_ACTIVE": "dev"
+		]
+	}
 }
 
 openApi {

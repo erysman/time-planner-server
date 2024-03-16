@@ -40,9 +40,11 @@ public class CreateTaskDTO implements Serializable {
     Integer durationMin;
 
     @Schema(nullable = true)
-    Boolean isImportant;
+    @Builder.Default
+    Boolean isImportant = false;
     @Schema(nullable = true)
-    Boolean isUrgent;
+    @Builder.Default
+    Boolean isUrgent = false;
 
     @Schema(nullable = true)
     UUID projectId;
